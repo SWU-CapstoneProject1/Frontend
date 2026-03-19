@@ -18,8 +18,8 @@ React 기반으로 사용자 인터페이스(UI)를 구현하는 프론트엔드
       <a href="https://github.com/kimdoyeon1234">@kimdoyeon1234</a>
     </td>
     <td align="center">
-      <img src="이미지2" width="120"><br/>
-      <a href="https://github.com/jeongkyueun">@jeongkyueun</a>
+      <img src="https://github.com/user-attachments/assets/70847e65-af3f-4f11-ac01-3559e2787b96" width="120"><br/>
+      <a href="https://github.com/jiyeoniii">@jiyeoniii</a>
     </td>
   </tr>
 </table>
