@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
+import type { RiskLevel } from '../../types' // ← 공통 타입에서 가져오기
 
-type RiskLevel = 'safe' | 'warning' | 'danger'
 
 interface BadgeProps {
   children: ReactNode

@@ -4,9 +4,10 @@ interface CardProps {
   children: ReactNode
   variant?: 'glass' | 'solid-dark' | 'solid-light'
   className?: string
+  onClick?: () => void  
 }
 
-function Card({ children, variant = 'glass', className = '' }: CardProps) {
+function Card({ children, variant = 'glass', className = '',onClick }: CardProps) {
   const variants = {
     // 글래스모피즘 (기본): 반투명 + 블러
     glass: 'bg-white/40 backdrop-blur-xl border border-white/50 shadow-lg',
@@ -19,7 +20,8 @@ function Card({ children, variant = 'glass', className = '' }: CardProps) {
   }
 
   return (
-    <div className={`rounded-2xl p-6 ${variants[variant]} ${className}`}>
+    <div className={`rounded-2xl p-6 ${variants[variant]} ${className}`} onClick={onClick}>
+    
       {children}
     </div>
   )
