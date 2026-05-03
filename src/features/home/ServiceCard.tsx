@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import type { ServiceAnalysis } from '../../types'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
@@ -7,6 +8,9 @@ interface ServiceCardProps {
 }
 
 function ServiceCard({ data }: ServiceCardProps) {
+
+  const navigate = useNavigate()
+  
   // 위험도별 라벨 매핑
   const riskLabels = {
     safe: '안전',
@@ -22,7 +26,11 @@ function ServiceCard({ data }: ServiceCardProps) {
   }
 
   return (
-    <Card variant="glass" className="min-w-[180px]">
+    <Card
+      variant="glass"
+      className="min-w-[180px] cursor-pointer hover:opacity-90 transition-opacity"
+      onClick={() => navigate(`/analysis/${data.id}`)}
+    >
       
       {/* 상단: 브랜드 원 */}
       <div className={`
