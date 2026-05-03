@@ -1,7 +1,17 @@
-import { keyIssues } from '../../constants/mockData'
-import Card from '../ui/Card'
+import Card from '../../components/ui/Card'
+import { useState, useEffect } from 'react'
+import { getKeyIssues } from '../../api/dashboard'
+import type { KeyIssue } from '../../types'
+
+
 
 function KeyIssuesCard() {
+   const [issues, setIssues] = useState<KeyIssue[]>([])
+
+  useEffect(() => {
+    getKeyIssues().then(setIssues)
+  }, [])
+  
   return (
     <Card variant="solid-dark" className="h-full">
       
@@ -18,7 +28,7 @@ function KeyIssuesCard() {
 
       {/* 이슈 리스트 */}
       <div className="space-y-3">
-        {keyIssues.map((issue, index) => (
+        {issues.map((issue, index) => (
           <IssueRow key={issue.id} issue={issue} index={index} />
         ))}
       </div>
@@ -27,8 +37,6 @@ function KeyIssuesCard() {
   )
 }
 
-// 한 줄짜리 이슈 행 (같은 파일 내 헬퍼)
-import type { KeyIssue } from '../../types'
 
 interface IssueRowProps {
   issue: KeyIssue

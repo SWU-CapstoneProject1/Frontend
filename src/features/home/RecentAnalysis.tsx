@@ -1,7 +1,15 @@
-import { recentAnalyses } from '../../constants/mockData'
+import { useState, useEffect } from 'react'
+import { getRecentAnalyses } from '../../api/analyses'
+import type { ServiceAnalysis } from '../../types'
 import ServiceCard from './ServiceCard'
 
 function RecentAnalysis() {
+  const [analyses, setAnalyses] = useState<ServiceAnalysis[]>([])
+
+  useEffect(() => {
+    getRecentAnalyses().then(setAnalyses)
+  }, [])
+
   return (
     <section className="px-6 py-8">
       <div className="max-w-6xl mx-auto">
@@ -19,7 +27,7 @@ function RecentAnalysis() {
 
         {/* 가로 스크롤 카드 리스트 */}
         <div className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6">
-          {recentAnalyses.map((analysis) => (
+          {analyses.map((analysis) => (
             <ServiceCard key={analysis.id} data={analysis} />
           ))}
         </div>

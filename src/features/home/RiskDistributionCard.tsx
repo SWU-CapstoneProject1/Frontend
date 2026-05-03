@@ -1,11 +1,19 @@
-import { riskDistribution } from '../../constants/mockData'
 import type { RiskDistribution } from '../../types'
-import Card from '../ui/Card'
+import Card from '../../components/ui/Card'
+import { useState, useEffect } from 'react'
+import { getRiskDistribution } from '../../api/dashboard'
+
+
 
 function RiskDistributionCard() {
   // 전체 카운트 계산
-  const total = riskDistribution.reduce((sum, item) => sum + item.count, 0)
+  const [riskDistribution, setRiskDistribution] = useState<RiskDistribution[]>([])
 
+  useEffect(() => {
+    getRiskDistribution().then(setRiskDistribution)
+  }, [])
+
+   const total = riskDistribution.reduce((sum, item) => sum + item.count, 0)
   return (
     <Card variant="solid-light" className="h-full">
       
