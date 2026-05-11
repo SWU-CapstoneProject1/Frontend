@@ -12,6 +12,10 @@ function Header({ activeNav, onNavChange }: HeaderProps) {
     { id: 'consent', label: '약관 동의' },
   ]
 
+  // TODO: useNavigate로 페이지 이동 연결
+  // 라우팅 경로 확정 후 별도 PR로 처리 예정
+  // (현재는 상태 변경만 동작, 실제 페이지 이동 X)
+
   return (
     <header className="sticky top-0 z-50 px-6 py-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
