@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 
-type RiskLevel = 'safe' | 'warning' | 'danger'
+import type { RiskLevel } from '../../types'
 
 interface BadgeProps {
   children: ReactNode
-  level: RiskLevel       // 위험도 (필수)
-  showDot?: boolean      // 좌측에 점 표시할지 (선택)
+  level: RiskLevel
+  showDot?: boolean
 }
 
 function Badge({ children, level, showDot = false }: BadgeProps) {

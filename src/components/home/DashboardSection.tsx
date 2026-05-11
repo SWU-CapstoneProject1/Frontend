@@ -9,7 +9,11 @@ function DashboardSection() {
         {/* 좌우 2열 그리드 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <GlobalStatusCard />
-          <TrendCard />
+          <TrendCard
+            totalCount={2847}
+            trendPercent={12}
+          />
+          
         </div>
 
       </div>

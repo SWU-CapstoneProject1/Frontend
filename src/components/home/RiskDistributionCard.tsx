@@ -1,6 +1,8 @@
-import { riskDistribution } from '../../constants/mockData'
 import type { RiskDistribution } from '../../types'
+
 import Card from '../ui/Card'
+
+import { riskDistribution } from '../../constants/mockData'
 
 function RiskDistributionCard() {
   // 전체 카운트 계산

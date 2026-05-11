@@ -1,5 +1,8 @@
-import { keyIssues } from '../../constants/mockData'
+import type { KeyIssue } from '../../types'
+
 import Card from '../ui/Card'
+
+import { keyIssues } from '../../constants/mockData'
 
 function KeyIssuesCard() {
   return (
@@ -26,9 +29,6 @@ function KeyIssuesCard() {
     </Card>
   )
 }
-
-// 한 줄짜리 이슈 행 (같은 파일 내 헬퍼)
-import type { KeyIssue } from '../../types'
 
 interface IssueRowProps {
   issue: KeyIssue
