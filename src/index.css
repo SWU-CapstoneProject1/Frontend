@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  /* 위험도 색상 */
+  --color-safe: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* 배경/텍스트 */
+  --color-paper: #f5f3ee;
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #6b6b6b;
+
+  /* 글래스모피즘 */
+  --color-glass: rgba(255, 255, 255, 0.4);
+  --color-glass-strong: rgba(255, 255, 255, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== 종이 질감 배경 ===== */
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  
+  /* 여러 레이어를 겹쳐서 종이 질감 만들기 */
+  background-image: 
+    /* 1. 부드러운 그라디언트 (음영 효과) */
+    radial-gradient(at 20% 0%, rgba(255, 255, 255, 0.6) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(0, 0, 0, 0.03) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(255, 255, 255, 0.4) 0px, transparent 50%),
+    /* 2. 종이 텍스처 (Transparent Textures의 무료 패턴) */
+    /* 1번 url('https://www.transparenttextures.com/patterns/cardboard-flat.png'); */
+    url('https://www.transparenttextures.com/patterns/exclusive-paper.png');
+  
+  background-attachment: fixed;
+  background-size: auto;
+  min-height: 100vh;
+
+  
+}
+
