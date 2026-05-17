@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import Tabs from '../../components/ui/Tabs'
 import Button from '../../components/ui/Button'
 
 function AnalyzeInput() {
+  const navigate = useNavigate()
   const [activeMode, setActiveMode] = useState('url')
   const [inputValue, setInputValue] = useState('')
 
@@ -13,7 +16,10 @@ function AnalyzeInput() {
   ]
 
   const handleAnalyze = () => {
-    alert(`[${activeMode}] 모드로 분석: ${inputValue}`)
+    // TODO: 실제 분석 API 호출 후 받은 id로 이동
+    // 지금은 임시로 mock id 사용
+    const mockAnalysisId = 'netflix'
+    navigate(`/analysis/${mockAnalysisId}`)
   }
 
   return (
