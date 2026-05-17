@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+
 import type { AnalysisClause, AnalysisReport } from '../../types'
-import { getAnalysisReport } from '../../api/analyses'
+
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
 import AnalysisHeader from '../../features/analysis/AnalysisHeader'
 import ClauseList from '../../features/analysis/ClauseList'
 import AiSidePanel from '../../features/analysis/AiSidePanel'
 
+import { getAnalysisReport } from '../../api/analyses'
+
 function AnalysisPage() {
-  const { id } = useParams<{ id: string }>()        // URL에서 서비스 id 가져오기
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [activeNav, setActiveNav] = useState('analysis')
   const [report, setReport] = useState<AnalysisReport | null>(null)
   const [hoveredClauseId, setHoveredClauseId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -34,7 +36,7 @@ function AnalysisPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen">
-        <Header activeNav={activeNav} onNavChange={setActiveNav} />
+        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-ink-soft text-sm">분석 중...</p>
         </div>
@@ -46,7 +48,7 @@ function AnalysisPage() {
   if (!report) {
     return (
       <div className="min-h-screen">
-        <Header activeNav={activeNav} onNavChange={setActiveNav} />
+        <Header />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
           <p className="text-ink-soft text-sm">분석 결과를 찾을 수 없습니다.</p>
           <button
@@ -62,7 +64,7 @@ function AnalysisPage() {
 
   return (
     <div className="min-h-screen">
-      <Header activeNav={activeNav} onNavChange={setActiveNav} />
+      <Header />
 
       <main className="max-w-6xl mx-auto px-6 pt-24 pb-20">
 
@@ -86,13 +88,10 @@ function AnalysisPage() {
 
         {/* 조항 목록 + AI 사이드 패널 */}
         <div className="flex gap-6">
-          {/* 좌측: 조항 목록 */}
           <ClauseList
             clauses={report.clauses}
             onHoverClause={setHoveredClauseId}
           />
-
-          {/* 우측: AI 패널 */}
           <AiSidePanel
             report={report}
             hoveredClause={hoveredClause}
