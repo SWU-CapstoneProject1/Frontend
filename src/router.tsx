@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import HomePage from './pages/home'
 import AnalysisPage from './pages/analysis'
+import SettingsPage from './pages/settings'
 
 const router = createBrowserRouter([
   {
@@ -10,6 +11,10 @@ const router = createBrowserRouter([
   {
     path: '/analysis/:id',
     element: <AnalysisPage />,
+  },
+  {
+    path: '/settings',
+    element: <SettingsPage />,
   },
 ])
 
