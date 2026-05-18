@@ -1,7 +1,8 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import HomePage from './pages/home'
 import AnalysisPage from './pages/analysis'
 import SettingsPage from './pages/settings'
+import LibraryPage from './pages/library';
 
 const router = createBrowserRouter([
   {
@@ -9,8 +10,16 @@ const router = createBrowserRouter([
     element: <HomePage />,
   },
   {
+    path: '/analysis',
+    element: <Navigate to="/analysis/netflix" replace />,
+  },
+  {
     path: '/analysis/:id',
     element: <AnalysisPage />,
+  },
+  {
+    path: '/library', 
+    element: <LibraryPage />,
   },
   {
     path: '/settings',
