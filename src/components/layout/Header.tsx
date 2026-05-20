@@ -5,14 +5,11 @@ import Tabs from '../ui/Tabs'
 function Header() {
   const navigate = useNavigate()
   const location = useLocation()
-
-  // TODO: /analysis, /archive 페이지 미구현 상태
-  // 해당 탭 클릭 시 404 발생 — 별도 PR에서 페이지 추가 예정
   
   const navTabs = [
     { id: 'dashboard', label: '대시보드', path: '/' },
-    { id: 'analysis', label: '약관 분석', path: '/analysis' },
-    { id: 'archive', label: '보관함', path: '/archive' },
+    { id: 'analysis', label: '약관 분석', path: '/analysis/netflix' },
+    { id: 'library', label: '보관함', path: '/library' },
     { id: 'settings', label: '설정', path: '/settings' },
   ]
 
