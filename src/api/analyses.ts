@@ -126,6 +126,23 @@ export async function analyzeTerms(body: AnalyzeRequest): Promise<string> {
   return data.job_id
 }
 
+// ── URL 분석 요청 타입 ─────────────────────────────────────
+interface AnalyzeUrlRequest {
+  service_name: string
+  session_key: string
+  url: string
+}
+
+/**
+ * URL 입력 분석 요청
+ * @param body - 서비스명, 세션키, 약관 URL
+ * @returns job_id — 이후 getAnalysisReport(job_id) 로 결과 조회
+ */
+export async function analyzeUrl(body: AnalyzeUrlRequest): Promise<string> {
+  const data = await apiPost<{ job_id: string }>('/api/analyze/url', body)
+  return data.job_id
+}
+
 export async function downloadAnalysisPdf(job_id: string): Promise<void> {
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/report/${job_id}/pdf`)
 
