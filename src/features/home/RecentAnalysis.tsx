@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getRecentAnalyses } from '../../api/analyses'
+import { getRecentAnalyses } from '../../api/home'
 import type { ServiceAnalysis } from '../../types'
 import ServiceCard from './ServiceCard'
 
