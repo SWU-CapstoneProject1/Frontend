@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom'
 
 import Tabs from '../../components/ui/Tabs'
 import Button from '../../components/ui/Button'
+import { analyzeTerms } from '../../api/analyses'
 
 function AnalyzeInput() {
   const navigate = useNavigate()
   const [activeMode, setActiveMode] = useState('url')
   const [inputValue, setInputValue] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const inputModes = [
     { id: 'url', label: '🔗 URL' },
@@ -15,11 +18,25 @@ function AnalyzeInput() {
     { id: 'text', label: 'T 텍스트' },
   ]
 
-  const handleAnalyze = () => {
-    // TODO: 실제 분석 API 호출 후 받은 id로 이동
-    // 지금은 임시로 mock id 사용
-    const mockAnalysisId = 'netflix'
-    navigate(`/analysis/${mockAnalysisId}`)
+  const handleAnalyze = async () => {
+    if (!inputValue.trim()) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const job_id = await analyzeTerms({
+        service_name: 'test',        
+        session_key: crypto.randomUUID(),
+        text: inputValue,
+      })
+      navigate(`/analysis/${job_id}`)
+    } catch (e) {
+      console.error('에러:', e)
+      setError('분석 요청에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -57,11 +74,14 @@ function AnalyzeInput() {
             className="flex-1 px-4 py-3 bg-white/40 backdrop-blur-md border border-white/50 rounded-xl text-sm focus:outline-none min-h-[48px] max-h-32"
           />
         )}
-        
-        <Button onClick={handleAnalyze}>
-          분석하기
+
+        <Button onClick={handleAnalyze} disabled={isLoading || !inputValue.trim()}>
+          {isLoading ? '분석 중...' : '분석하기'}
         </Button>
       </div>
+
+      {/* 에러 메시지 */}
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
     </div>
   )
