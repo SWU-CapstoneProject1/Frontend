@@ -143,6 +143,46 @@ export async function analyzeUrl(body: AnalyzeUrlRequest): Promise<string> {
   return data.job_id
 }
 
+// ── 파일 분석 요청 ─────────────────────────────────────────
+
+interface AnalyzeFileResponse {
+  job_id: string
+  status: string
+  message: string
+}
+
+/**
+ * 파일 업로드 분석 요청 (PDF, 이미지)
+ * @param file - 업로드할 파일
+ * @param service_name - 서비스 이름
+ * @param session_key - 세션 키
+ * @returns job_id — 이후 getAnalysisReport(job_id) 로 결과 조회
+ */
+export async function analyzeFile(
+  file: File,
+  service_name: string,
+  session_key: string,
+): Promise<string> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('service_name', service_name)
+  formData.append('session_key', session_key)
+
+  const baseUrl = import.meta.env.VITE_API_BASE_URL
+  const res = await fetch(`${baseUrl}/api/analyze/file`, {
+    method: 'POST',
+    body: formData,
+    // ⚠️ Content-Type 헤더 직접 X! FormData 쓰면 브라우저가 자동 설정
+  })
+
+  if (!res.ok) {
+    throw new Error(`파일 분석 요청 실패: ${res.status}`)
+  }
+
+  const data: AnalyzeFileResponse = await res.json()
+  return data.job_id
+}
+
 export async function downloadAnalysisPdf(job_id: string): Promise<void> {
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/report/${job_id}/pdf`)
 
