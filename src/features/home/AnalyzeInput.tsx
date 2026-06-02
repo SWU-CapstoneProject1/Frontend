@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import Tabs from '../../components/ui/Tabs'
 import Button from '../../components/ui/Button'
 
-import { analyzeTerms, analyzeUrl } from '../../api/analyses'
+import { analyzeTerms, analyzeUrl, analyzeFile } from '../../api/analyses'
 
 function AnalyzeInput() {
   const navigate = useNavigate()
   const [activeMode, setActiveMode] = useState('url')
   const [inputValue, setInputValue] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -19,15 +20,29 @@ function AnalyzeInput() {
     { id: 'text', label: 'T 텍스트' },
   ]
 
+  // 모드별 입력 유효성 검사
+  const isInputValid = 
+    activeMode === 'file' 
+      ? selectedFile !== null 
+      : inputValue.trim().length > 0
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedFile(file)
+      setError(null)
+    }
+  }
+
   const handleAnalyze = async () => {
-    if (!inputValue.trim()) return
+    if (!isInputValid) return
 
     setIsLoading(true)
     setError(null)
 
     // TODO: 로그인 기능 추가되면 실제 세션 키로 교체
     const session_key = crypto.randomUUID()
-    // TODO: service_name 입력 칸 추가 (백엔드 요구사항)
+    // TODO: service_name 입력 UI 추가 (백엔드 요구사항)
     const service_name = 'test'
 
     try {
@@ -45,12 +60,12 @@ function AnalyzeInput() {
           session_key,
           text: inputValue,
         })
+      } else if (activeMode === 'file' && selectedFile) {
+        job_id = await analyzeFile(selectedFile, service_name, session_key)
       } else {
-        // file 모드는 아직 미구현
-        setError('파일 분석은 아직 구현 중입니다.')
         return
       }
-      
+
       navigate(`/analysis/${job_id}`)
     } catch (e) {
       console.error('에러:', e)
@@ -67,7 +82,12 @@ function AnalyzeInput() {
       <Tabs
         items={inputModes}
         activeId={activeMode}
-        onChange={setActiveMode}
+        onChange={(id) => {
+          setActiveMode(id)
+          setInputValue('')
+          setSelectedFile(null)
+          setError(null)
+        }}
         variant="underline"
       />
 
@@ -83,9 +103,19 @@ function AnalyzeInput() {
           />
         )}
         {activeMode === 'file' && (
-          <div className="flex-1 px-4 py-3 bg-white/40 backdrop-blur-md border border-white/50 border-dashed rounded-xl text-sm text-ink-soft text-center">
-            파일을 드래그하거나 클릭
-          </div>
+          <label className="flex-1 px-4 py-3 bg-white/40 backdrop-blur-md border border-white/50 border-dashed rounded-xl text-sm text-ink-soft text-center cursor-pointer hover:bg-white/60 transition-colors">
+            <input
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {selectedFile ? (
+              <span className="text-ink">📄 {selectedFile.name}</span>
+            ) : (
+              <span>파일을 클릭하여 선택 (PDF, 이미지)</span>
+            )}
+          </label>
         )}
         {activeMode === 'text' && (
           <textarea
@@ -96,7 +126,7 @@ function AnalyzeInput() {
           />
         )}
 
-        <Button onClick={handleAnalyze} disabled={isLoading || !inputValue.trim()}>
+        <Button onClick={handleAnalyze} disabled={isLoading || !isInputValid}>
           {isLoading ? '분석 중...' : '분석하기'}
         </Button>
       </div>
