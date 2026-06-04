@@ -15,6 +15,7 @@ interface ApiClause {
   original: string
   risk_level: 'danger' | 'caution' | 'safe'
   summary: string
+  precedents: ApiPrecedent[]
 }
 
 interface ApiPrecedent {
@@ -38,29 +39,30 @@ interface ApiAnalysisResult {
   precedents: ApiPrecedent[]
 }
 
-// ── API 응답 → 프론트 타입 변환 ───────────────────────────
+// ── API 응답 → 프론트 타입 변환  ───────────────────────────
 function mapToAnalysisReport(data: ApiAnalysisResult): AnalysisReport {
   return {
     id: data.job_id,
-    name: data.service_name,
-    color: '#000000',  // API 미제공 → 기본값 (추후 백엔드 추가 시 교체)
-    initial: data.service_name?.[0] ?? '?',
+    name: data.service_name || '이름 없는 서비스', 
+    color: '#4F46E5',  
+    initial: data.service_name?.[0] ?? '?', 
     riskScore: data.risk_score,
     totalClauses: data.clauses?.length ?? 0,
     riskClauses: data.danger_count + data.caution_count,
-    lastAnalyzed: new Date().toLocaleString('ko-KR'),
-    summary: '',       // API 미제공 → 추후 백엔드 추가 시 교체
+    lastAnalyzed: new Date().toLocaleString('ko-KR'), 
+    summary: `${data.service_name || '본'} 약관의 위험 조항은 총 ${data.danger_count}개, 주의 조항은 ${data.caution_count}개입니다.`, 
     clauses: (data.clauses ?? []).map((c) => ({
       id: c.id,
-      num: c.index,
-      title: `조항 ${c.index}`,
+      num: c.index + 1,
+      title: `제 ${c.index + 1} 조`, 
       risk: c.risk_level === 'danger'  ? 'danger'
           : c.risk_level === 'caution' ? 'warning'
           : 'safe',
       text: c.original,
       aiSummary: c.summary ?? '',
-      // 판례는 조항별 매핑이 없으므로 전체 판례를 공통으로 연결
-      cases: (data.precedents ?? []).map((p) => ({
+      
+     
+      cases: (c.precedents ?? []).map((p) => ({
         title: p.case_no,
         year: p.date?.slice(0, 4) ?? '',
         relevance: Math.round((p.similarity ?? 0) * 100),
@@ -71,40 +73,26 @@ function mapToAnalysisReport(data: ApiAnalysisResult): AnalysisReport {
 }
 
 // ── API 함수들 ────────────────────────────────────────────
-
-
 /**
  * 분석 결과 조회
  * @param job_id - 분석 요청 시 발급된 job ID
  * @returns 분석 완료 시 AnalysisReport, 아직 분석 중이면 null
  *
  * 사용 예시 (폴링):
- *   const data = await getAnalysisReport(job_id)
- *   if (!data) // 아직 분석 중 → 재시도
+ * const data = await getAnalysisReport(job_id)
+ * if (!data) // 아직 분석 중 → 재시도
  */
 export async function getAnalysisReport(job_id: string): Promise<AnalysisReport | null> {
-  // 임시 더미 — 백엔드 연결 전 테스트용
-  // TODO: 백엔드 정상화되면 이 블록 삭제
-  if (job_id === 'test-job-123') {
-    return {
-      id: 'test-job-123',
-      name: '테스트 서비스',
-      color: '#000000',
-      initial: 'T',
-      riskScore: 72,
-      totalClauses: 5,
-      riskClauses: 3,
-      lastAnalyzed: new Date().toLocaleString('ko-KR'),
-      summary: '테스트용 더미 데이터입니다.',
-      clauses: [],
-    }
-  }
-
   try {
     const data = await apiGet<ApiAnalysisResult>(`/api/result/${job_id}`)
+    
+    // 아직 분석이 끝나지 않은 상태('pending' 또는 'processing')라면 null을 반환해서 프론트가 폴링을 계속하게 만듦
     if (data.status === 'pending' || data.status === 'processing') return null
+    
+    // 분석이 완전히 완료('done')되면 백엔드 데이터를 프론트 타입으로 가공해서 반환
     return mapToAnalysisReport(data)
   } catch (e) {
+    // 404 에러(아직 생성 안 됨 등)가 나도 null을 반환해서 예외 처리
     if (e instanceof ApiError && e.status === 404) return null
     throw e
   }
