@@ -10,6 +10,7 @@ function AnalyzeInput() {
   const navigate = useNavigate()
   const [activeMode, setActiveMode] = useState('url')
   const [inputValue, setInputValue] = useState('')
+  const [serviceName, setServiceName] = useState('') 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -20,11 +21,12 @@ function AnalyzeInput() {
     { id: 'text', label: 'T 텍스트' },
   ]
 
-  // 모드별 입력 유효성 검사
+  // 서비스 이름도 채워져 있고 + 모드별 입력값도 유효해야 버튼 활성화!
   const isInputValid = 
-    activeMode === 'file' 
+    serviceName.trim().length > 0 && 
+    (activeMode === 'file' 
       ? selectedFile !== null 
-      : inputValue.trim().length > 0
+      : inputValue.trim().length > 0)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -40,10 +42,10 @@ function AnalyzeInput() {
     setIsLoading(true)
     setError(null)
 
-    // TODO: 로그인 기능 추가되면 실제 세션 키로 교체
-    const session_key = crypto.randomUUID()
-    // TODO: service_name 입력 UI 추가 (백엔드 요구사항)
-    const service_name = 'test'
+    // 보관함 동기화용 세션 키 고정
+    const session_key = 'testkey'
+
+    const service_name = serviceName.trim()
 
     try {
       let job_id: string
@@ -78,6 +80,17 @@ function AnalyzeInput() {
   return (
     <div className="space-y-3 max-w-xl">
       
+      
+      <div className="w-full">
+        <input
+          type="text"
+          value={serviceName}
+          onChange={(e) => setServiceName(e.target.value)}
+          placeholder="분석할 서비스 이름을 입력해주세요 (예: 당근마켓)"
+          className="w-full px-4 py-3 bg-white/40 backdrop-blur-md border border-white/50 rounded-xl text-sm focus:outline-none focus:bg-white/60 transition-colors font-semibold"
+        />
+      </div>
+
       {/* 모드 선택 탭 */}
       <Tabs
         items={inputModes}

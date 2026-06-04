@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import type { AnalysisReport } from '../../types'
-import { downloadAnalysisPdf, bookmarkAnalysis } from '../../api/analyses'
+import { downloadAnalysisPdf } from '../../api/analyses'
 
 interface AnalysisHeaderProps {
   report: AnalysisReport
+  onBookmark: () => Promise<void> 
 }
 
-function AnalysisHeader({ report }: AnalysisHeaderProps) {
+function AnalysisHeader({ report, onBookmark }: AnalysisHeaderProps) {
   const [isPdfLoading, setIsPdfLoading] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isBookmarkLoading, setIsBookmarkLoading] = useState(false)
@@ -26,14 +27,18 @@ function AnalysisHeader({ report }: AnalysisHeaderProps) {
     if (isBookmarked) return
     setIsBookmarkLoading(true)
     try {
-      await bookmarkAnalysis(report.id, crypto.randomUUID())
+      await onBookmark()
       setIsBookmarked(true)
     } catch (e) {
-      alert('보관함 저장에 실패했습니다.')
+      // 에러 처리는 부모 위임
     } finally {
       setIsBookmarkLoading(false)
     }
   }
+
+  // 위험 조항과 주의 조항을 데이터에서 직접 카운트 (통계 보완)
+  const dangerCount = report.clauses.filter(c => c.risk === 'danger').length
+  const warningCount = report.clauses.filter(c => c.risk === 'warning').length
 
   return (
     <div
@@ -47,7 +52,6 @@ function AnalysisHeader({ report }: AnalysisHeaderProps) {
       }}
     >
       <div className="flex items-start justify-between mb-6">
-
         <div className="flex items-center gap-5">
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
@@ -56,38 +60,16 @@ function AnalysisHeader({ report }: AnalysisHeaderProps) {
               boxShadow: `0 4px 16px ${report.color}30`,
             }}
           >
-            <span className="text-white text-xl font-black">
-              {report.initial}
-            </span>
+            <span className="text-white text-xl font-black">{report.initial}</span>
           </div>
-
           <div>
-            <h2 className="text-2xl font-black tracking-tight text-ink mb-1">
-              {report.name}
-            </h2>
-            <p className="text-xs text-ink-soft leading-relaxed max-w-md">
-              {report.summary}
-            </p>
+            <h2 className="text-2xl font-black tracking-tight text-ink mb-1">{report.name}</h2>
+            <p className="text-xs text-ink-soft leading-relaxed max-w-md">{report.summary}</p>
           </div>
         </div>
 
-        {/* 우측: 원문 + 재분석 + 보관함 + PDF 버튼 */}
+        {/* 우측: 원문, 재분석 버튼 삭제 후 보관함 + PDF 버튼만 남김 */}
         <div className="flex items-center gap-2">
-          {['원문', '재분석'].map((label) => (
-            <button
-              key={label}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors"
-              style={{
-                background: 'rgba(0,0,0,0.03)',
-                border: '1px solid rgba(0,0,0,0.06)',
-                color: 'rgba(0,0,0,0.35)',
-              }}
-            >
-              {label}
-            </button>
-          ))}
-
-          {/* 보관함 저장 버튼 */}
           <button
             onClick={handleBookmark}
             disabled={isBookmarkLoading || isBookmarked}
@@ -101,7 +83,6 @@ function AnalysisHeader({ report }: AnalysisHeaderProps) {
             {isBookmarkLoading ? '저장 중...' : isBookmarked ? '🔖 저장됨' : '🔖 보관함'}
           </button>
 
-          {/* PDF 다운로드 버튼 */}
           <button
             onClick={handleDownloadPdf}
             disabled={isPdfLoading}
@@ -117,12 +98,16 @@ function AnalysisHeader({ report }: AnalysisHeaderProps) {
         </div>
       </div>
 
-      {/* 하단: 통계 4개 */}
+      {/* 하단: 통계 4개 (위험/주의 분리 표시) */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: '위험도', value: `${report.riskScore}점`, color: '#ef4444' },
           { label: '전체 조항', value: `${report.totalClauses}개`, color: 'rgba(0,0,0,0.6)' },
-          { label: '위험 조항', value: `${report.riskClauses}개`, color: '#ef4444' },
+          { 
+            label: '위험 / 주의 조항', 
+            value: `${dangerCount}개 / ${warningCount}개`, // 💡 위험과 주의 개수를 같이 표기!
+            color: dangerCount > 0 ? '#ef4444' : warningCount > 0 ? '#f59e0b' : 'rgba(0,0,0,0.6)' 
+          },
           { label: '분석 일시', value: report.lastAnalyzed, color: 'rgba(0,0,0,0.35)' },
         ].map((stat) => (
           <div
@@ -134,9 +119,7 @@ function AnalysisHeader({ report }: AnalysisHeaderProps) {
             }}
           >
             <p className="text-[0.65rem] text-ink-soft mb-1">{stat.label}</p>
-            <p className="text-lg font-bold" style={{ color: stat.color }}>
-              {stat.value}
-            </p>
+            <p className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</p>
           </div>
         ))}
       </div>

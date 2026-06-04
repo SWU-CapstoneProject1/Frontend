@@ -19,8 +19,8 @@ function mapRiskLevel(risk_level: string): '위험' | '주의' | '정상' {
   return '정상'
 }
 
-// TODO: 백엔드 세션 연결 시 실제 session_key로 교체
-const SESSION_KEY = 'test-session'
+
+const SESSION_KEY = 'testkey' 
 
 function LibraryPage() {
   const navigate = useNavigate()
