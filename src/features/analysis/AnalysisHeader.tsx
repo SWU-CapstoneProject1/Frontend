@@ -105,7 +105,7 @@ function AnalysisHeader({ report, onBookmark }: AnalysisHeaderProps) {
           { label: '전체 조항', value: `${report.totalClauses}개`, color: 'rgba(0,0,0,0.6)' },
           { 
             label: '위험 / 주의 조항', 
-            value: `${dangerCount}개 / ${warningCount}개`, // 💡 위험과 주의 개수를 같이 표기!
+            value: `${dangerCount}개 / ${warningCount}개`,
             color: dangerCount > 0 ? '#ef4444' : warningCount > 0 ? '#f59e0b' : 'rgba(0,0,0,0.6)' 
           },
           { label: '분석 일시', value: report.lastAnalyzed, color: 'rgba(0,0,0,0.35)' },

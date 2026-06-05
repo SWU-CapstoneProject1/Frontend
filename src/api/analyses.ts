@@ -160,7 +160,6 @@ export async function analyzeFile(
   const res = await fetch(`${baseUrl}/api/analyze/file`, {
     method: 'POST',
     body: formData,
-    // ⚠️ Content-Type 헤더 직접 X! FormData 쓰면 브라우저가 자동 설정
   })
 
   if (!res.ok) {

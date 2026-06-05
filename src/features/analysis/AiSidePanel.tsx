@@ -22,7 +22,7 @@ interface AiSidePanelProps {
 
 function AiSidePanel({ report, hoveredClause, onHoverPanel, onViewOriginal }: AiSidePanelProps) {
   return (
-    // 💡 Tailwind v4 경고 반영: w-[300px] -> w-75
+    
     <div className="w-75 shrink-0">
       <div className="sticky top-24">
         {hoveredClause ? (
@@ -52,7 +52,7 @@ function AiSidePanel({ report, hoveredClause, onHoverPanel, onViewOriginal }: Ai
             {/* AI 분석 요약 박스 */}
             <div className="p-4 rounded-2xl mb-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-center gap-2 mb-2">
-                {/* 💡 Tailwind v4 경고 반영: bg-gradient-to-r -> bg-linear-to-r */}
+                
                 <span className="text-sm font-bold bg-linear-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">✦</span>
                 <span className="text-xs font-semibold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 분석</span>
               </div>
@@ -71,7 +71,6 @@ function AiSidePanel({ report, hoveredClause, onHoverPanel, onViewOriginal }: Ai
                     <CaseCard 
                       key={c.title} 
                       caseData={c} 
-                      // 💡 여기를 true로 수정! 오른쪽 패널은 무조건 어두우니까 텍스트도 화이트 톤으로 고정이야!
                       isDark={true} 
                       onViewOriginal={() => onViewOriginal(hoveredClause.id)} 
                     />
@@ -84,7 +83,7 @@ function AiSidePanel({ report, hoveredClause, onHoverPanel, onViewOriginal }: Ai
           /* 기본 핵심 위험 요약 */
           <div className="p-6 rounded-3xl" style={{ background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.45)', backdropFilter: 'blur(40px) saturate(1.4)', WebkitBackdropFilter: 'blur(40px) saturate(1.4)', boxShadow: '0 8px 32px rgba(0,0,0,0.03)' }}>
             <div className="flex items-center gap-2 mb-4"><span className="text-sm">⚠️</span><h4 className="text-sm font-bold text-ink">핵심 위험 및 주의 요약</h4></div>
-            {/* 💡 Tailwind v4 경고 반영: max-h-[320px] -> max-h-80 */}
+            
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
               {report.clauses.filter((c) => c.risk === 'danger' || c.risk === 'warning').map((c) => (
                 <div key={c.id} className="flex items-start gap-2.5">
