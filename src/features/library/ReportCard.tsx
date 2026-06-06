@@ -5,11 +5,10 @@ export interface ReportData {
   title: string
   date: string
   score: number
-  clauseCount: number
+  clauseCount: number 
   status: '위험' | '주의' | '정상' 
 }
 
-// 타입스크립트 인덱싱 매핑을 위한 Record 타입 지정
 const statusLabels: Record<'위험' | '주의' | '정상', string> = { 
   위험: '위험', 
   주의: '주의', 
@@ -31,7 +30,6 @@ interface ReportCardProps {
 function ReportCard({ data, isAddCard = false, onDelete }: ReportCardProps) {
   const [isHovered, setIsHovered] = useState(false)
 
-  // 2. 새 분석 추가 카드
   if (isAddCard) {
     return (
       <div className="relative h-[266px] rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300 bg-white/20 border border-white/45 backdrop-blur-md shadow-sm text-ink-soft hover:text-ink">
@@ -42,7 +40,6 @@ function ReportCard({ data, isAddCard = false, onDelete }: ReportCardProps) {
   }
 
   if (!data) return null
-
   const currentStatus = data.status;
 
   return (
@@ -74,7 +71,6 @@ function ReportCard({ data, isAddCard = false, onDelete }: ReportCardProps) {
             {data.title}
           </h4>
         </div>
-        <span className="text-xs text-gray-400">★</span> 
       </div>
 
       {/* 위험도 프로그레스 바 영역 */}
@@ -85,25 +81,21 @@ function ReportCard({ data, isAddCard = false, onDelete }: ReportCardProps) {
           <span className="ml-2 text-gray-400">조항 {data.clauseCount}개</span>
         </div>
         
-        {/* 가로 프로그레스 바 선형차트 이식 */}
         <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${data.score}%`, backgroundColor: statusColors[currentStatus] }} />
         </div>
       </div>
 
-      {/* 하단 공유 / 삭제 제어 탭 */}
-      <div className="grid grid-cols-2 gap-2 pt-2" style={{ borderTop: `1px solid ${isHovered ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'}` }}>
-        <button className="py-1.5 rounded-xl text-xs font-medium border text-center transition-colors" style={{ color: isHovered ? '#fff' : '#666', transform: 'scale(1)', borderColor: isHovered ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }}>
-          🔄 공유
-        </button>
+     
+      <div className="grid grid-cols-1 pt-2" style={{ borderTop: `1px solid ${isHovered ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'}` }}>
         <button 
           onClick={(e) => { 
             e.stopPropagation(); 
             onDelete?.(data.id); 
           }} 
-          className="py-1.5 rounded-xl text-xs font-medium border text-center text-red-400 border-red-100 hover:bg-red-50/10 cursor-pointer"
+          className="py-2 rounded-xl text-xs font-bold border text-center text-red-400 border-red-100 hover:bg-red-50/20 bg-red-50/5 transition-colors cursor-pointer"
         >
-          🗑️ 삭제
+          🗑️ 삭제하기
         </button>
       </div>
     </div>
