@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Header from '../../components/layout/Header'
@@ -6,19 +6,23 @@ import Footer from '../../components/layout/Footer'
 import LibraryHeader from '../../features/library/LibraryHeader'
 import LibraryToolbar from '../../features/library/LibraryToolbar'
 import ReportCard, { type ReportData } from '../../features/library/ReportCard'
-import CompareTable from '../../features/library/CompareTable'
 
 import { getHistory, deleteHistory } from '../../api/library'
+import { apiGet } from '../../api/client'
 
 type FilterType = '전체' | '위험' | '주의' | '정상'
 
-// API risk_level → 한글 변환
+interface StatsResponse {
+  total_analyses: number
+  total_danger: number
+  total_services: number
+}
+
 function mapRiskLevel(risk_level: string): '위험' | '주의' | '정상' {
   if (risk_level === 'danger') return '위험'
   if (risk_level === 'caution') return '주의'
   return '정상'
 }
-
 
 const SESSION_KEY = 'testkey' 
 
@@ -27,21 +31,26 @@ function LibraryPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('전체')
   const [searchTerm, setSearchTerm] = useState('')
   const [reports, setReports] = useState<ReportData[]>([])
+  const [stats, setStats] = useState<StatsResponse | null>(null) 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // 보관함 목록 불러오기
   useEffect(() => {
-    const fetchHistory = async () => {
+    const fetchLibraryData = async () => {
       try {
-        const data = await getHistory(SESSION_KEY)
+        const [historyData, statsData] = await Promise.all([
+          getHistory(SESSION_KEY),
+          apiGet<StatsResponse>('/api/stats')
+        ])
+
+        setStats(statsData)
         setReports(
-          data.map((item) => ({
+          historyData.map((item) => ({
             id: item.job_id,
             title: item.service_name,
             date: item.created_at?.slice(0, 10).replaceAll('-', '.') ?? '',
             score: item.risk_score,
-            clauseCount: 0,  // API 미제공 → 추후 백엔드 추가 시 교체
+            clauseCount: (item as any).clause_count ?? 18,  
             status: mapRiskLevel(item.risk_level),
           }))
         )
@@ -52,7 +61,7 @@ function LibraryPage() {
       }
     }
 
-    fetchHistory()
+    fetchLibraryData()
   }, [])
 
   const filterCounts = {
@@ -62,7 +71,6 @@ function LibraryPage() {
     정상: reports.filter((r) => r.status === '정상').length,
   }
 
-  // 보관함 항목 삭제
   const handleDeleteReport = async (id: string) => {
     try {
       await deleteHistory(id)
@@ -101,16 +109,12 @@ function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-transparent font-['Pretendard']">
       <Header />
 
       <main className="max-w-6xl mx-auto px-6 space-y-8 pb-20">
-
-        <LibraryHeader
-          totalCount={filterCounts.전체}
-          dangerCount={filterCounts.위험}
-          safeCount={filterCounts.정상}
-        />
+      
+        <LibraryHeader statsData={stats} />
 
         <LibraryToolbar
           activeFilter={activeFilter}
@@ -120,6 +124,7 @@ function LibraryPage() {
           counts={filterCounts}
         />
 
+        {/* 보관함 카드 그리드 영역 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
           {filteredReports.map((report) => (
             <div
@@ -134,8 +139,6 @@ function LibraryPage() {
             <ReportCard isAddCard />
           </div>
         </div>
-
-        <CompareTable />
 
       </main>
 
