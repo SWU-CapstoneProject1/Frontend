@@ -18,8 +18,6 @@ const riskLabels = {
 
 function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-  
-  // 현재 카드가 펼쳐져야 하는 상태인지 판별
   const isExpanded = expandedId === clause.id
 
   const handleMouseEnter = () => {
@@ -29,7 +27,7 @@ function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardP
 
   const handleMouseLeave = () => {
     setIsHovered(false)
-    onHover(null) // 마우스 떠날 때 부모 지연 타이머 가동 유도
+    onHover(null)
   }
 
   return (
@@ -37,7 +35,7 @@ function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardP
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      id={`clause-card-${clause.id}`} // 원문보기 포커싱을 위한 DOM ID 매핑
+      id={`clause-card-${clause.id}`}
     >
       {/* 배경 장식 번호 */}
       <div
@@ -81,6 +79,7 @@ function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardP
 
           {/* 중앙: 제목 + 원문 텍스트 */}
           <div className="flex-1 min-w-0">
+          
             <h4
               className="text-base font-bold mb-1.5 transition-colors duration-300"
               style={{ color: isHovered ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.75)' }}
@@ -88,7 +87,6 @@ function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardP
               {clause.title}
             </h4>
             
-            {/* 닫혀있을 땐 두 줄 말줄임표, 드롭다운이 열리면 원문 통째로 전부 노출 */}
             <p
               className={`text-sm leading-relaxed transition-colors duration-300 whitespace-pre-wrap ${!isExpanded ? 'line-clamp-2' : ''}`}
               style={{ color: isHovered ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.55)' }}
@@ -126,7 +124,7 @@ function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardP
               </span>
             </div>
             
-            {clause.cases.length > 0 ? (
+            {clause.cases && clause.cases.length > 0 ? (
               <div className="grid grid-cols-1 gap-2">
                 {clause.cases.map((c) => (
                   <CaseCard 

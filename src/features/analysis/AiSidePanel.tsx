@@ -73,6 +73,7 @@ function AiSidePanel({ report, hoveredClause, onHoverPanel, onViewOriginal }: Ai
                       caseData={c} 
                       isDark={true} 
                       onViewOriginal={() => onViewOriginal(hoveredClause.id)} 
+                      isSidePanel={true}
                     />
                   ))}
                 </div>
