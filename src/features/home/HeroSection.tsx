@@ -2,7 +2,13 @@ import HeroCopy from './HeroCopy'
 import KpiCards from './KpiCards'
 import AnalyzeInput from './AnalyzeInput'
 
-function HeroSection() {
+
+interface HeroSectionProps {
+  onStartAnalysis: (analyzePromise: Promise<string>) => void
+}
+
+
+function HeroSection({ onStartAnalysis }: HeroSectionProps) {
   return (
     <section className="px-6 py-12 md:py-20">
       <div className="max-w-6xl mx-auto">
@@ -20,8 +26,8 @@ function HeroSection() {
 
         </div>
 
-        {/* 하단: 입력창 (전체 너비 차지) */}
-        <AnalyzeInput />
+        
+        <AnalyzeInput onStartAnalysis={onStartAnalysis} />
 
       </div>
     </section>

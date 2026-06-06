@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-
 import Tabs from '../ui/Tabs'
 
 function Header() {
@@ -8,7 +7,6 @@ function Header() {
   
   const navTabs = [
     { id: 'dashboard', label: '대시보드', path: '/' },
-    { id: 'analysis', label: '약관 분석', path: '/analysis/netflix' },
     { id: 'library', label: '보관함', path: '/library' },
     { id: 'settings', label: '설정', path: '/settings' },
   ]
@@ -17,15 +15,18 @@ function Header() {
   const getActiveTab = () => {
     const currentPath = location.pathname
     
-    // 정확히 매칭
+    // 정확히 매칭되는 메인 탭 확인
     const exactMatch = navTabs.find(tab => tab.path === currentPath)
     if (exactMatch) return exactMatch.id
     
-    // 부분 매칭 (예: /analysis/netflix 도 analysis 탭으로 인식)
+    // 부분 매칭 처리 (/library 등 하위 페이지 고려)
     const partialMatch = navTabs.find(tab => 
       tab.path !== '/' && currentPath.startsWith(tab.path)
     )
     if (partialMatch) return partialMatch.id
+    
+    
+    if (currentPath.startsWith('/analysis')) return ''
     
     // 기본값
     return 'dashboard'
