@@ -1,11 +1,10 @@
 import { useState } from 'react'
+import type { ReportData } from './ReportCard'
 
 type BadgeStatus = '위험' | '주의' | '정상'
 
-interface RowData {
-  category: string
-  serviceA: BadgeStatus
-  serviceB: BadgeStatus
+interface CompareTableProps {
+  reports: ReportData[] 
 }
 
 const riskColors = {
@@ -14,17 +13,24 @@ const riskColors = {
   정상: '#22c55e',
 }
 
-function CompareTable() {
-  const [serviceA] = useState('쿠팡 플레이')
-  const [serviceB] = useState('넷플릭스')
+function CompareTable({ reports }: CompareTableProps) {
+  
+  const [selectedIdA, setSelectedIdA] = useState(reports[0]?.id ?? '')
+  const [selectedIdB, setSelectedIdB] = useState(reports[1]?.id ?? '')
 
-  const rows: RowData[] = [
-    { category: '자동결제', serviceA: '위험', serviceB: '주의' },
-    { category: '개인정보 활용', serviceA: '위험', serviceB: '위험' },
-    { category: '환불 면책', serviceA: '주의', serviceB: '정상' },
-    { category: '콘텐츠 저작권', serviceA: '정상', serviceB: '주의' },
-    { category: '계정 해지', serviceA: '주의', serviceB: '정상' },
-  ]
+  const serviceA = reports.find(r => r.id === selectedIdA);
+  const serviceB = reports.find(r => r.id === selectedIdB);
+
+  
+  const getStatusByScore = (score: number, offset: number): BadgeStatus => {
+    const mockScore = (score + offset) % 100;
+    if (mockScore > 65) return '위험'
+    if (mockScore > 35) return '주의'
+    return '정상'
+  }
+
+  // 고정된 카테고리 데이터 구조
+  const categories = ['자동결제', '개인정보 활용', '환불 면책', '콘텐츠 저작권', '계정 해지']
 
   return (
     <div
@@ -43,9 +49,25 @@ function CompareTable() {
           <h3 className="text-lg font-bold text-white">동종 서비스 약관 비교</h3>
           <p className="text-xs text-gray-400">유사한 서비스의 약관을 비교하여 인사이트를 얻으세요</p>
         </div>
-        <button className="px-3 py-1.5 rounded-xl text-xs bg-white/5 border border-white/10 text-gray-300">
-          비교 대상 선택 ▾
-        </button>
+        <div className="flex gap-2">
+          {/* ▾ 서비스 A 선택 셀렉트 박스 */}
+          <select 
+            value={selectedIdA} 
+            onChange={(e) => setSelectedIdA(e.target.value)}
+            className="px-3 py-1.5 rounded-xl text-xs bg-white/5 border border-white/10 text-gray-300 outline-none cursor-pointer"
+          >
+            {reports.map(r => <option key={r.id} value={r.id} className="text-black">{r.title}</option>)}
+          </select>
+
+          {/* ▾ 서비스 B 선택 셀렉트 박스 */}
+          <select 
+            value={selectedIdB} 
+            onChange={(e) => setSelectedIdB(e.target.value)}
+            className="px-3 py-1.5 rounded-xl text-xs bg-white/5 border border-white/10 text-gray-300 outline-none cursor-pointer"
+          >
+            {reports.map(r => <option key={r.id} value={r.id} className="text-black">{r.title}</option>)}
+          </select>
+        </div>
       </div>
 
       {/* 테이블 영역 */}
@@ -53,18 +75,23 @@ function CompareTable() {
         <thead>
           <tr className="border-b border-white/10 text-gray-400 text-xs">
             <th className="pb-3 w-1/3">카테고리</th>
-            <th className="pb-3 w-1/3">쿠팡 플레이</th>
-            <th className="pb-3 w-1/3">넷플릭스</th>
+            <th className="pb-3 w-1/3">{serviceA?.title ?? '서비스 A'}</th>
+            <th className="pb-3 w-1/3">{serviceB?.title ?? '서비스 B'}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-white/5 text-sm">
-          {rows.map((row, index) => (
-            <tr key={index} className="hover:bg-white/5">
-              <td className="py-4 text-gray-300">{row.category}</td>
-              <td className="py-4 font-semibold" style={{ color: riskColors[row.serviceA] }}>{row.serviceA}</td>
-              <td className="py-4 font-semibold" style={{ color: riskColors[row.serviceB] }}>{row.serviceB}</td>
-            </tr>
-          ))}
+          {categories.map((category, index) => {
+            const statusA = getStatusByScore(serviceA?.score ?? 0, index * 15)
+            const statusB = getStatusByScore(serviceB?.score ?? 0, index * 25)
+            
+            return (
+              <tr key={index} className="hover:bg-white/5">
+                <td className="py-4 text-gray-300">{category}</td>
+                <td className="py-4 font-semibold" style={{ color: riskColors[statusA] }}>{statusA}</td>
+                <td className="py-4 font-semibold" style={{ color: riskColors[statusB] }}>{statusB}</td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
