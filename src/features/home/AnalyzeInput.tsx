@@ -6,7 +6,12 @@ import Button from '../../components/ui/Button'
 
 import { analyzeTerms, analyzeUrl, analyzeFile } from '../../api/analyses'
 
-function AnalyzeInput() {
+
+interface AnalyzeInputProps {
+  onStartAnalysis: (analyzePromise: Promise<string>) => void
+}
+
+function AnalyzeInput({ onStartAnalysis }: AnalyzeInputProps) {
   const navigate = useNavigate()
   const [activeMode, setActiveMode] = useState('url')
   const [inputValue, setInputValue] = useState('')
@@ -21,7 +26,6 @@ function AnalyzeInput() {
     { id: 'text', label: 'T 텍스트' },
   ]
 
-  // 서비스 이름도 채워져 있고 + 모드별 입력값도 유효해야 버튼 활성화!
   const isInputValid = 
     serviceName.trim().length > 0 && 
     (activeMode === 'file' 
@@ -36,50 +40,40 @@ function AnalyzeInput() {
     }
   }
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!isInputValid) return
 
-    setIsLoading(true)
     setError(null)
-
-    // 보관함 동기화용 세션 키 고정
     const session_key = 'testkey'
-
     const service_name = serviceName.trim()
 
-    try {
-      let job_id: string
+    
+    let analyzePromise: Promise<string>
 
-      if (activeMode === 'url') {
-        job_id = await analyzeUrl({
-          service_name,
-          session_key,
-          url: inputValue,
-        })
-      } else if (activeMode === 'text') {
-        job_id = await analyzeTerms({
-          service_name,
-          session_key,
-          text: inputValue,
-        })
-      } else if (activeMode === 'file' && selectedFile) {
-        job_id = await analyzeFile(selectedFile, service_name, session_key)
-      } else {
-        return
-      }
-
-      navigate(`/analysis/${job_id}`)
-    } catch (e) {
-      console.error('에러:', e)
-      setError('분석 요청에 실패했습니다. 다시 시도해주세요.')
-    } finally {
-      setIsLoading(false)
+    if (activeMode === 'url') {
+      analyzePromise = analyzeUrl({
+        service_name,
+        session_key,
+        url: inputValue,
+      })
+    } else if (activeMode === 'text') {
+      analyzePromise = analyzeTerms({
+        service_name,
+        session_key,
+        text: inputValue,
+      })
+    } else if (activeMode === 'file' && selectedFile) {
+      analyzePromise = analyzeFile(selectedFile, service_name, session_key)
+    } else {
+      return
     }
+
+    
+    onStartAnalysis(analyzePromise)
   }
 
   return (
     <div className="space-y-3 max-w-xl">
-      
       
       <div className="w-full">
         <input
@@ -140,7 +134,7 @@ function AnalyzeInput() {
         )}
 
         <Button onClick={handleAnalyze} disabled={isLoading || !isInputValid}>
-          {isLoading ? '분석 중...' : '분석하기'}
+          분석하기
         </Button>
       </div>
 
