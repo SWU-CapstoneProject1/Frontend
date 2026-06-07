@@ -11,16 +11,20 @@ import { apiGet, ApiError } from './client'
 // ── API 응답 타입 (백엔드 스펙) ───────────────────────────
 export interface HistoryItem {
   job_id: string
+  status: string
   service_name: string
   risk_score: number
-  created_at: string
-  risk_level: string
+  danger_count: number
+  caution_count: number
+  safe_count: number
+  clauses: unknown[]
+  created_at?: string
 }
 
 /**
  * 보관함 목록 조회
  * @param session_key - 세션 키
- * @param risk_level - 위험도 필터 (선택)
+ * 
  */
 export async function getHistory(session_key: string, risk_level?: string): Promise<HistoryItem[]> {
   const params = new URLSearchParams({ session_key })
