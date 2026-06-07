@@ -62,17 +62,17 @@ function TechStackCarousel() {
   const [active, setActive] = useState(2)
 
   return (
-    <section className="w-full bg-white px-4 py-28">
+    <section className="w-full bg-white px-4 py-28 transition-colors duration-300 dark:bg-slate-950">
       <div className="mx-auto mb-14 max-w-3xl text-center">
-        <span className="text-[10px] font-black tracking-widest text-sky-600 uppercase">
+        <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
           AI ARCHITECTURE
         </span>
 
-        <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900">
+        <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900 dark:text-slate-50">
           정확한 분석을 위한 기술 구조
         </h2>
 
-        <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-relaxed text-stone-500">
+        <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-relaxed text-stone-500 dark:text-slate-400">
           약관 문서 추출부터 위험 조항 분류, 판례 검색, 쉬운 해설까지 하나의 흐름으로 처리합니다.
         </p>
       </div>
@@ -100,29 +100,31 @@ function TechStackCarousel() {
               transition={{ type: 'spring', stiffness: 200, damping: 25 }}
             >
               <div
-                className={`relative flex h-[270px] w-[215px] flex-col overflow-hidden rounded-[30px] border bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.07)] transition-all ${
-                  isActive ? 'border-sky-200' : 'border-stone-200'
+                className={`relative flex h-[270px] w-[215px] flex-col overflow-hidden rounded-[30px] border bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.07)] transition-all dark:bg-slate-900/80 dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] ${
+                  isActive
+                    ? 'border-sky-200 dark:border-sky-400/40'
+                    : 'border-stone-200 dark:border-white/10'
                 }`}
               >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50">
-                  <Icon size={24} className="text-sky-600" />
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 dark:bg-sky-500/10">
+                  <Icon size={24} className="text-sky-600 dark:text-sky-400" />
                 </div>
 
-                <h3 className="text-base font-black leading-snug text-stone-900">
+                <h3 className="text-base font-black leading-snug text-stone-900 dark:text-slate-50">
                   {item.name}
                 </h3>
 
-                <p className="mt-2 text-xs font-bold leading-relaxed text-stone-500">
+                <p className="mt-2 text-xs font-bold leading-relaxed text-stone-500 dark:text-slate-400">
                   {item.details[0].desc}
                 </p>
 
                 <div className="mt-auto">
-                  <span className="rounded-full bg-sky-50 px-3 py-1 text-[10px] font-black text-sky-600">
+                  <span className="rounded-full bg-sky-50 px-3 py-1 text-[10px] font-black text-sky-600 dark:bg-sky-500/10 dark:text-sky-300">
                     {item.tag}
                   </span>
                 </div>
 
-                <div className="absolute bottom-0 left-0 h-1 w-full bg-sky-500" />
+                <div className="absolute bottom-0 left-0 h-1 w-full bg-sky-500 dark:bg-sky-400" />
               </div>
             </motion.div>
           )
@@ -135,24 +137,24 @@ function TechStackCarousel() {
             key={active}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[30px] border border-stone-200 bg-white p-8 shadow-[0_18px_45px_rgba(15,23,42,0.06)]"
+            className="rounded-[30px] border border-stone-200 bg-white p-8 shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
           >
-            <h3 className="mb-6 flex items-center gap-2 text-base font-black text-stone-900">
+            <h3 className="mb-6 flex items-center gap-2 text-base font-black text-stone-900 dark:text-slate-50">
               {(() => {
                 const I = techStacks[active].icon
-                return <I size={20} className="text-sky-600" />
+                return <I size={20} className="text-sky-600 dark:text-sky-400" />
               })()}
               {techStacks[active].name} 상세 기술 원리
             </h3>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
               {techStacks[active].details.map((detail, i) => (
-                <div key={i} className="border-l-2 border-sky-100 pl-4">
-                  <h4 className="text-sm font-black text-sky-600">
+                <div key={i} className="border-l-2 border-sky-100 pl-4 dark:border-sky-400/20">
+                  <h4 className="text-sm font-black text-sky-600 dark:text-sky-400">
                     {detail.tech}
                   </h4>
 
-                  <p className="mt-1 text-sm font-bold leading-relaxed text-stone-500">
+                  <p className="mt-1 text-sm font-bold leading-relaxed text-stone-500 dark:text-slate-400">
                     {detail.desc}
                   </p>
                 </div>

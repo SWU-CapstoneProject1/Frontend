@@ -6,40 +6,38 @@ function Footer() {
   ]
 
   return (
-    <footer className="mt-20 px-6 py-8 border-t border-stone-200/60">
-      <div className="max-w-6xl mx-auto">
-        
-        {/* 상단: 브랜딩 + 링크 */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
-          
-          {/* 좌측: 브랜딩 */}
+    <footer className="mt-20 border-t border-stone-200/60 px-6 py-8 transition-colors duration-300 dark:border-white/10 dark:bg-slate-950">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="space-y-1">
-            <p className="font-semibold text-ink">약간동의</p>
-            <p className="text-xs text-ink-soft">AI 기반 약관 분석 서비스</p>
-            <p className="text-xs text-ink-soft">불공정 조항을 빠르게 탐지합니다</p>
+            <p className="font-semibold text-stone-900 dark:text-slate-50">
+              약간동의
+            </p>
+            <p className="text-xs text-stone-500 dark:text-slate-400">
+              AI 기반 약관 분석 서비스
+            </p>
+            <p className="text-xs text-stone-500 dark:text-slate-400">
+              불공정 조항을 빠르게 탐지합니다
+            </p>
           </div>
 
-          {/* 우측: 링크들 */}
           <nav className="flex items-center gap-6">
             {links.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-xs text-ink-soft hover:text-ink transition-colors"
+                className="text-xs text-stone-500 transition-colors hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-50"
               >
                 {link.label}
               </a>
             ))}
           </nav>
-
         </div>
 
-        {/* 하단: 저작권 */}
-        <p className="text-xs text-ink-soft/60 leading-relaxed">
-          © 2026 약간동의. All rights reserved. 
+        <p className="text-xs leading-relaxed text-stone-400 dark:text-slate-500">
+          © 2026 약간동의. All rights reserved.
           This service is for informational purposes only and does not constitute legal advice.
         </p>
-
       </div>
     </footer>
   )

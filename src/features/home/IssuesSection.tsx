@@ -38,17 +38,17 @@ function IssuesSection() {
   ]
 
   return (
-    <section className="relative w-full min-h-[88vh] bg-[#F7F7F8] py-28 overflow-hidden">
+    <section className="relative min-h-[88vh] w-full overflow-hidden bg-[#F7F7F8] py-28 transition-colors duration-300 dark:bg-slate-950">
       <div className="relative z-20 mx-auto mb-14 max-w-3xl px-6 text-center">
-        <span className="text-[10px] font-black tracking-widest text-sky-600 uppercase">
+        <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
           USER PAIN POINT
         </span>
 
-        <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900">
+        <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900 dark:text-slate-50">
           약관, 정말 이해하고 동의하고 있나요?
         </h2>
 
-        <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-relaxed text-stone-500">
+        <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-relaxed text-stone-500 dark:text-slate-400">
           환불 제한, 자동 결제, 개인정보 제공 같은 중요한 조건은 대부분 긴 문장 속에 숨어 있습니다.
         </p>
       </div>
@@ -69,24 +69,24 @@ function IssuesSection() {
             }}
             whileHover={{ y: -8, scale: 1.03 }}
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-            className="absolute min-w-[280px] max-w-[330px] cursor-pointer rounded-[28px] border border-stone-200 bg-white p-6 text-left shadow-[0_16px_40px_rgba(15,23,42,0.06)]"
+            className="absolute min-w-[280px] max-w-[330px] cursor-pointer rounded-[28px] border border-stone-200 bg-white p-6 text-left shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
           >
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sm dark:bg-sky-500/10">
                 👤
               </div>
 
               <div>
-                <p className="mb-1 text-[10px] font-black text-sky-600">
+                <p className="mb-1 text-[10px] font-black text-sky-600 dark:text-sky-400">
                   {review.name}
                 </p>
-                <p className="text-sm font-bold leading-relaxed text-stone-800">
+                <p className="text-sm font-bold leading-relaxed text-stone-800 dark:text-slate-200">
                   “{review.text}”
                 </p>
               </div>
             </div>
 
-            <div className="absolute -bottom-2 left-8 h-4 w-4 rotate-45 bg-white shadow-[5px_5px_5px_rgba(0,0,0,0.02)]" />
+            <div className="absolute -bottom-2 left-8 h-4 w-4 rotate-45 bg-white shadow-[5px_5px_5px_rgba(0,0,0,0.02)] dark:bg-slate-900" />
           </motion.div>
         ))}
       </div>

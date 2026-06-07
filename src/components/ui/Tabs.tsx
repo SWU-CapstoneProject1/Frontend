@@ -19,7 +19,7 @@ function Tabs({
 }: TabsProps) {
   if (variant === 'pill') {
     return (
-      <div className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-100/80 p-1">
+      <div className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-100/80 p-1 transition-colors duration-300 dark:border-white/10 dark:bg-white/5">
         {items.map((item) => {
           const isActive = activeId === item.id
           const Icon = item.icon
@@ -33,8 +33,8 @@ function Tabs({
                 text-sm font-bold transition-all duration-200
                 ${
                   isActive
-                    ? 'bg-white text-stone-950 shadow-sm'
-                    : 'text-stone-500 hover:text-stone-900'
+                    ? 'bg-white text-stone-950 shadow-sm dark:bg-white/15 dark:text-slate-50'
+                    : 'text-stone-500 hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-50'
                 }
               `}
             >
@@ -54,7 +54,7 @@ function Tabs({
   }
 
   return (
-    <div className="flex items-center gap-4 border-b border-stone-200">
+    <div className="flex items-center gap-4 border-b border-stone-200 transition-colors duration-300 dark:border-white/10">
       {items.map((item) => {
         const isActive = activeId === item.id
 
@@ -67,15 +67,15 @@ function Tabs({
               transition-colors duration-200
               ${
                 isActive
-                  ? 'text-stone-950'
-                  : 'text-stone-500 hover:text-stone-900'
+                  ? 'text-stone-950 dark:text-slate-50'
+                  : 'text-stone-500 hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-50'
               }
             `}
           >
             {item.label}
 
             {isActive && (
-              <span className="absolute -bottom-px left-0 right-0 h-0.5 bg-stone-950" />
+              <span className="absolute -bottom-px left-0 right-0 h-0.5 bg-stone-950 dark:bg-sky-400" />
             )}
           </button>
         )
