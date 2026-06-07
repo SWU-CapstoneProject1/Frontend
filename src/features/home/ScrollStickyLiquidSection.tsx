@@ -1,46 +1,70 @@
-import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import LiquidGlassCard from '../../components/ui/LiquidGlassCard'
+const steps = [
+  {
+    number: '01',
+    label: 'INPUT',
+    title: '약관 입력',
+    desc: 'URL, 파일, 텍스트 중 원하는 방식으로 약관을 입력합니다.',
+  },
+  {
+    number: '02',
+    label: 'DETECT',
+    title: '위험 조항 탐지',
+    desc: 'AI가 환불 제한, 자동 결제, 개인정보 제공 같은 위험 조항을 찾아냅니다.',
+  },
+  {
+    number: '03',
+    label: 'EXPLAIN',
+    title: '쉬운 해설',
+    desc: '어려운 법률 문장을 사용자가 이해하기 쉬운 말로 정리합니다.',
+  },
+]
 
 function ScrollStickyLiquidSection() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  
-  // 스크롤 트래킹을 통해 물바닥 레이어 높낮이 정밀 연동
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  })
-
   return (
-    <div ref={containerRef} className="relative w-full bg-stone-950 text-white min-h-[180vh]">
-      
-      {/*  숫자를 실시간으로 덮고 투과시키는 리퀴드 렌즈 */}
-      <div className="sticky top-0 left-0 w-full h-screen flex items-center justify-center pointer-events-none z-20">
-        <div className="w-[420px] h-[160px] opacity-90">
-          {/* 내부 children 없이 투과 필터링 본연의 역할 수행 */}
-          <LiquidGlassCard className="w-full h-full shadow-[0_0_80px_rgba(255,255,255,0.1)]" />
-        </div>
-      </div>
+    <section className="w-full bg-white py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="mb-14 text-center">
+          <span className="text-[10px] font-black tracking-widest text-sky-600 uppercase">
+            SOLUTION FLOW
+          </span>
 
-      {/* 스크롤에 따라 위로 슥 지나가는 대형 데이터 숫자 레이어 */}
-      <div className="relative w-full flex flex-col items-center justify-start z-10 space-y-[45vh] pt-[25vh] pb-[30vh]">
-        
-        {/* 78% 스펙 라인 */}
-        <div className="text-center max-w-md mix-blend-difference">
-          <h2 className="text-[7rem] font-black tracking-tighter leading-none text-white">78%</h2>
-          <p className="text-stone-400 font-bold text-xs mt-4">사용자가 약관을 읽지 않고 동의합니다</p>
-        </div>
-
-        {/* 32page 스펙 라인 */}
-        <div className="text-center max-w-md mix-blend-difference">
-          <h2 className="text-[6.5rem] font-black tracking-tighter leading-none text-white">
-            32<span className="text-2xl font-bold text-stone-400 ml-1">page</span>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900">
+            약간동의는 이렇게 분석합니다
           </h2>
-          <p className="text-stone-400 font-bold text-xs mt-4">앱 가입 시 필요한 평균 이용약관 분량</p>
+
+          <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-relaxed text-stone-500">
+            긴 약관을 직접 읽지 않아도, 중요한 위험 조항과 핵심 내용을 빠르게 확인할 수 있습니다.
+          </p>
         </div>
 
+        <div className="grid gap-6 md:grid-cols-3">
+          {steps.map((step) => (
+            <div
+              key={step.number}
+              className="group min-h-[250px] rounded-[30px] border border-stone-200 bg-white p-8 shadow-[0_16px_40px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(15,23,42,0.08)]"
+            >
+              <div className="mb-10 flex items-center justify-between">
+                <span className="rounded-full bg-sky-50 px-3 py-1 text-[10px] font-black text-sky-600">
+                  {step.label}
+                </span>
+
+                <span className="text-5xl font-black tracking-tight text-stone-100 transition-colors group-hover:text-sky-100">
+                  {step.number}
+                </span>
+              </div>
+
+              <h3 className="text-xl font-black text-stone-900">
+                {step.title}
+              </h3>
+
+              <p className="mt-4 text-sm font-bold leading-relaxed text-stone-500">
+                {step.desc}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 

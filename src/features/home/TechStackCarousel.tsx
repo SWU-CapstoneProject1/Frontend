@@ -1,81 +1,165 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  AlertTriangle,
+  FileText,
+  Link,
+  Search,
+  MessageCircle,
+} from 'lucide-react'
 
-interface TechItem {
-  id: number
-  name: string
-  desc: string
-  spec: string
-}
-
-const techStacks: TechItem[] = [
-  { id: 0, name: "React 19", desc: "컴포넌트 기반 UI 아키텍처", spec: "가상 DOM 최적화 및 고성능 렌더링 스레드를 가동하여 3D 인터랙션을 매끄럽게 제어합니다." },
-  { id: 1, name: "Framer Motion", desc: "물리 엔진 기반 3D 애니메이션", spec: "SVG 베지어 곡선 모핑 및 스크롤 인터랙티브 가속도를 수학적 물리 기반으로 연산합니다." },
-  { id: 2, name: "TypeScript", desc: "정적 타입 안정성 확보", spec: "컴포넌트 간 Props 데이터 파이프라인의 타입을 컴파일 시점에 완벽 규격화합니다." },
-  { id: 3, name: "Tailwind CSS v4", desc: "유틸리티 퍼스트 스타일링", spec: "런타임 오버헤드 제로의 차세대 JIT 엔진을 통해 고해상도 글래스모피즘 코드를 매핑합니다." }
+const techStacks = [
+  {
+    name: '데이터 수집 및 추출',
+    icon: Link,
+    tag: 'Processing',
+    details: [
+      { tech: 'FastAPI', desc: 'RESTful API 구현 및 서버 최적화' },
+      { tech: 'PyMuPDF', desc: 'PDF 문서 정밀 처리 및 데이터 추출' },
+      { tech: 'Tesseract OCR', desc: '이미지 내 텍스트 인식' },
+      { tech: 'BackgroundTasks', desc: '비동기 작업 처리' },
+    ],
+  },
+  {
+    name: 'AI 위험 감지',
+    icon: FileText,
+    tag: 'AI/Data',
+    details: [
+      { tech: 'KoELECTRA', desc: '약관 조항 위험도 분류' },
+      { tech: '불공정 패턴 분석', desc: '독소 조항 실시간 탐지' },
+    ],
+  },
+  {
+    name: '심결례 분석 엔진',
+    icon: Search,
+    tag: 'Analysis',
+    details: [
+      { tech: 'FAISS', desc: '벡터 유사도 검색 및 인덱싱' },
+      { tech: 'RAG', desc: '판례 검색 증강 생성' },
+    ],
+  },
+  {
+    name: '사용자 해설',
+    icon: MessageCircle,
+    tag: 'Service',
+    details: [
+      { tech: 'Gemini API', desc: '법률 용어 쉬운 해설' },
+      { tech: 'Prompt Engineering', desc: '맞춤형 해설 생성' },
+    ],
+  },
+  {
+    name: '시스템 영속성',
+    icon: AlertTriangle,
+    tag: 'Backend',
+    details: [
+      { tech: 'SQLAlchemy', desc: 'ORM 및 데이터 모델링' },
+      { tech: 'SQLite', desc: 'MVP 데이터 저장소' },
+    ],
+  },
 ]
 
 function TechStackCarousel() {
-  const [activeId, setActiveId] = useState(1) // Framer Motion 기본 활성화
+  const [active, setActive] = useState(2)
 
   return (
-    <section className="w-full py-24 bg-white flex flex-col items-center overflow-hidden border-b border-stone-200/60">
-      <div className="w-full max-w-4xl text-center px-6 mb-12">
-        <span className="text-[10px] font-black tracking-widest text-sky-600 uppercase">TECH STACK WHEEL</span>
-        <h3 className="text-xl font-black text-stone-800 mt-2 tracking-tight">우리가 사용하는 코어 기술 스택</h3>
+    <section className="w-full bg-white px-4 py-28">
+      <div className="mx-auto mb-14 max-w-3xl text-center">
+        <span className="text-[10px] font-black tracking-widest text-sky-600 uppercase">
+          AI ARCHITECTURE
+        </span>
+
+        <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900">
+          정확한 분석을 위한 기술 구조
+        </h2>
+
+        <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-relaxed text-stone-500">
+          약관 문서 추출부터 위험 조항 분류, 판례 검색, 쉬운 해설까지 하나의 흐름으로 처리합니다.
+        </p>
       </div>
 
-      {/* 3D 회전 캐러셀 컨테이너 트랙 */}
-      <div className="relative flex items-center justify-center w-full h-44 max-w-3xl">
-        {techStacks.map((tech) => {
-          const offset = tech.id - activeId
-          const isActive = tech.id === activeId
+      <div className="relative mx-auto mb-10 flex h-[330px] w-full max-w-6xl items-center justify-center">
+        {techStacks.map((item, index) => {
+          const offset = (index - active + techStacks.length) % techStacks.length
+          const displayOffset =
+            offset > techStacks.length / 2 ? offset - techStacks.length : offset
+
+          const Icon = item.icon
+          const isActive = displayOffset === 0
 
           return (
             <motion.div
-              key={tech.id}
-              onClick={() => setActiveId(tech.id)}
+              key={item.name}
+              onClick={() => setActive(index)}
+              className="absolute cursor-pointer"
               animate={{
-                x: offset * 180,
-                scale: isActive ? 1.15 : 0.85,
-                rotateY: offset * -25,
-                opacity: Math.abs(offset) > 1 ? 0.4 : 1,
-                z: isActive ? 100 : 0
+                x: displayOffset * 190,
+                scale: isActive ? 1 : 0.82,
+                opacity: 1 - Math.abs(displayOffset) * 0.25,
+                zIndex: 10 - Math.abs(displayOffset),
               }}
-              transition={{ type: "spring", stiffness: 300, damping: 22 }}
-              className={`absolute w-44 p-5 rounded-2xl border text-center cursor-pointer select-none shadow-md ${
-                isActive 
-                  ? 'bg-linear-to-b from-stone-900 to-stone-800 text-white border-stone-950' 
-                  : 'bg-stone-50 text-stone-500 border-stone-200'
-              }`}
+              transition={{ type: 'spring', stiffness: 200, damping: 25 }}
             >
-              <h4 className="text-sm font-black">{tech.name}</h4>
-              <p className="text-[10px] mt-1 opacity-70">{tech.desc}</p>
+              <div
+                className={`relative flex h-[270px] w-[215px] flex-col overflow-hidden rounded-[30px] border bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.07)] transition-all ${
+                  isActive ? 'border-sky-200' : 'border-stone-200'
+                }`}
+              >
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50">
+                  <Icon size={24} className="text-sky-600" />
+                </div>
+
+                <h3 className="text-base font-black leading-snug text-stone-900">
+                  {item.name}
+                </h3>
+
+                <p className="mt-2 text-xs font-bold leading-relaxed text-stone-500">
+                  {item.details[0].desc}
+                </p>
+
+                <div className="mt-auto">
+                  <span className="rounded-full bg-sky-50 px-3 py-1 text-[10px] font-black text-sky-600">
+                    {item.tag}
+                  </span>
+                </div>
+
+                <div className="absolute bottom-0 left-0 h-1 w-full bg-sky-500" />
+              </div>
             </motion.div>
-          );
+          )
         })}
       </div>
 
-      {/* 하단 네모 상자: 선택된 기술 상세 설명 패널 */}
-      <div className="w-full max-w-xl mx-auto px-6 mt-6">
-        <div className="w-full bg-stone-50 rounded-2xl border border-stone-200 p-6 shadow-xs min-h-[100px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeId}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.2 }}
-            >
-              <h5 className="text-xs font-black text-sky-600 mb-1">
-                {techStacks[activeId].name} 상세 명세
-              </h5>
-              <p className="text-xs text-stone-600 font-medium leading-relaxed">
-                {techStacks[activeId].spec}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+      <div className="mx-auto w-full max-w-4xl px-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-[30px] border border-stone-200 bg-white p-8 shadow-[0_18px_45px_rgba(15,23,42,0.06)]"
+          >
+            <h3 className="mb-6 flex items-center gap-2 text-base font-black text-stone-900">
+              {(() => {
+                const I = techStacks[active].icon
+                return <I size={20} className="text-sky-600" />
+              })()}
+              {techStacks[active].name} 상세 기술 원리
+            </h3>
+
+            <div className="grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
+              {techStacks[active].details.map((detail, i) => (
+                <div key={i} className="border-l-2 border-sky-100 pl-4">
+                  <h4 className="text-sm font-black text-sky-600">
+                    {detail.tech}
+                  </h4>
+
+                  <p className="mt-1 text-sm font-bold leading-relaxed text-stone-500">
+                    {detail.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   )

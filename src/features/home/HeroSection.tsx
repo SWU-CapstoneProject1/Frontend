@@ -1,49 +1,92 @@
-import { useState } from 'react'
-import AnalyzeInput from './AnalyzeInput'
+import { motion } from 'framer-motion'
+import glassChainImg from '../../assets/images/glass_chain_v2.png'
 
-// 1. 부모(HomePage)로부터는 오직 분석 시작 함수
 interface HeroSectionProps {
-  onStartAnalysis: (promise: Promise<string>) => void
+  onScrollToInput?: () => void
 }
 
-function HeroSection({ onStartAnalysis }: HeroSectionProps) {
-  // 2. 탭 상태는 이 HeroSection 내부에서 직접 관리
-  const [activeTab, setActiveTab] = useState<'url' | 'file' | 'text'>('url')
-
+function HeroSection({ onScrollToInput }: HeroSectionProps) {
   return (
-    <section id="analysis-input-zone" className="w-full py-28 bg-white border-t border-stone-200/50 flex flex-col items-center">
-      <div className="w-full max-w-4xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        
-        {/* 좌측: 기획서 내용 타이틀 타이포그래피 */}
+    <section className="relative w-screen h-screen bg-white flex items-center justify-between overflow-hidden select-none font-['Pretendard'] pt-20">
+      <div className="flex flex-col justify-center h-full pl-8 md:pl-16 lg:pl-24 xl:pl-32 z-10 max-w-xl text-left space-y-6 -mt-12 relative">
         <div className="space-y-4">
-          <span className="text-[10px] font-black tracking-widest text-stone-400 uppercase">AI-POWERED TERMS ANALYSIS</span>
-          <h2 className="text-4xl font-black text-stone-800 leading-tight tracking-tight">
-            이런 경험,<br />한 번쯤 있지<br />
-            <span className="text-stone-300">않으셨나요?</span>
-          </h2>
-          <p className="text-xs font-bold text-stone-500 leading-relaxed pt-2">
-            길고 복잡한 약관을 제대로 읽지 못한 채<br />
-            '동의' 버튼을 눌러야 했던 순간들.<br />
-            약간동의는 그 불안함에서 출발했습니다.
-          </p>
+          <motion.h1
+            className="text-4xl md:text-5xl font-black text-stone-900 tracking-tight leading-[1.25]"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
+            약관의 모든 것,<br />
+            약관동의에서<br />
+            쉽고 안전하게
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.6 }}
+            className="text-xs md:text-sm font-bold text-stone-400 leading-relaxed pt-1"
+          >
+            AI 기반 이용약관 독소 조항 분석 플랫폼
+          </motion.p>
         </div>
 
-        {/* 우측: 디자인 시안 탭 브라우저 및 인풋 컴포넌트 박스 */}
-        <div className="w-full bg-stone-50 rounded-2xl border border-stone-200/70 p-6 shadow-sm space-y-6">
-          
-          {/* 탭 상단 메뉴바 제어 버튼 */}
-          <div className="flex gap-4 border-b border-stone-200 pb-3 text-xs font-black text-stone-400">
-            <button onClick={() => setActiveTab('url')} className={`pb-1 transition-all ${activeTab === 'url' ? 'text-sky-600 border-b-2 border-sky-600' : 'hover:text-stone-600'}`}>🔗 URL 주소</button>
-            <button onClick={() => setActiveTab('file')} className={`pb-1 transition-all ${activeTab === 'file' ? 'text-sky-600 border-b-2 border-sky-600' : 'hover:text-stone-600'}`}>📂 파일 업로드</button>
-            <button onClick={() => setActiveTab('text')} className={`pb-1 transition-all ${activeTab === 'text' ? 'text-sky-600 border-b-2 border-sky-600' : 'hover:text-stone-600'}`}>📄 직접 텍스트</button>
-          </div>
-          
-          
-          
-          <AnalyzeInput activeTab={activeTab} onStartAnalysis={onStartAnalysis} />
-        </div>
-
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="flex items-center justify-start pt-2"
+        >
+          <button
+            onClick={onScrollToInput}
+            className="
+              rounded-[22px]
+              bg-stone-950
+              px-8
+              py-4
+              text-sm
+              font-black
+              text-white
+              shadow-[0_12px_30px_rgba(15,23,42,0.12)]
+              transition-all
+              duration-200
+              hover:-translate-y-0.5
+              hover:bg-sky-600
+              hover:shadow-[0_16px_35px_rgba(14,165,233,0.22)]
+              active:scale-[0.98]
+            "
+          >
+            분석하기
+          </button>
+        </motion.div>
       </div>
+
+      <div className="absolute right-0 top-0 h-full w-[65%] pointer-events-none z-0 flex items-center justify-end overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white via-[15%] to-transparent z-10 w-full h-full" />
+
+        <img
+          src={glassChainImg}
+          alt=""
+          className="w-full h-full object-cover object-center scale-135 origin-center translate-x-[18%] select-none pointer-events-none"
+        />
+      </div>
+
+      <motion.div
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center text-stone-900 z-20 cursor-pointer"
+        onClick={onScrollToInput}
+      >
+        <svg
+          className="w-7 h-7 stroke-current fill-none"
+          viewBox="0 0 24 24"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </motion.div>
     </section>
   )
 }
