@@ -9,7 +9,7 @@ function LiquidGlassCard({ children, className = '' }: LiquidGlassCardProps) {
   return (
     <div className={`relative ${className}`}>
       
-      {/* 💡 레퍼런스 .effect 스타일 그대로 이식: 원본 backdrop-filter + saturate 매핑 */}
+      {/*  backdrop-filter + saturate 매핑 */}
       <div 
         className="absolute inset-0 z-0 rounded-[43px]"
         style={{
@@ -36,7 +36,7 @@ function LiquidGlassCard({ children, className = '' }: LiquidGlassCardProps) {
         {children}
       </div>
 
-      {/* 💡 가져온 SVG 원본 필터 마크업 그대로 박제 */}
+      
       <svg className="absolute w-full h-full inset-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="filter" colorInterpolationFilters="sRGB">
