@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
+import { apiGet } from '../../api/client'
 
-function CountUpItem({ label, targetValue }: { label: string; targetValue: number }) {
+interface StatsResponse {
+  total_analyses: number
+  total_danger: number
+  total_services: number
+}
+
+function CountUpItem({
+  label,
+  targetValue,
+}: {
+  label: string
+  targetValue: number
+}) {
   const [count, setCount] = useState(0)
   const elementRef = useRef<HTMLDivElement>(null)
 
@@ -11,6 +24,7 @@ function CountUpItem({ label, targetValue }: { label: string; targetValue: numbe
       ([entry]) => {
         if (entry.isIntersecting && !started) {
           started = true
+
           let start = 0
           const duration = 1500
           const stepTime = 20
@@ -19,6 +33,7 @@ function CountUpItem({ label, targetValue }: { label: string; targetValue: numbe
 
           const timer = setInterval(() => {
             start += increment
+
             if (start >= targetValue) {
               clearInterval(timer)
               setCount(targetValue)
@@ -32,13 +47,14 @@ function CountUpItem({ label, targetValue }: { label: string; targetValue: numbe
     )
 
     if (elementRef.current) observer.observe(elementRef.current)
+
     return () => observer.disconnect()
   }, [targetValue])
 
   return (
     <div
       ref={elementRef}
-      className="flex flex-col items-center justify-center rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_16px_40px_rgba(15,23,42,0.05)] transition-all duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
+      className="flex flex-col items-center justify-center rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_16px_40px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_20px_50px_rgba(14,165,233,0.12)] dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)] dark:hover:border-sky-400/40 dark:hover:bg-slate-900 dark:hover:shadow-[0_0_40px_rgba(56,189,248,0.18)]"
     >
       <span className="mb-2 text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
         {label}
@@ -52,6 +68,25 @@ function CountUpItem({ label, targetValue }: { label: string; targetValue: numbe
 }
 
 function RecentAnalysis() {
+  const [stats, setStats] = useState<StatsResponse>({
+    total_analyses: 0,
+    total_danger: 0,
+    total_services: 0,
+  })
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await apiGet<StatsResponse>('/api/stats')
+        setStats(data)
+      } catch (e) {
+        console.error('통계 데이터를 불러오지 못했습니다.', e)
+      }
+    }
+
+    fetchStats()
+  }, [])
+
   return (
     <section className="w-full bg-[#F7F7F8] py-28 transition-colors duration-300 dark:bg-slate-950">
       <div className="mx-auto max-w-5xl px-6">
@@ -70,9 +105,20 @@ function RecentAnalysis() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <CountUpItem label="ANALYZED TERMS" targetValue={1234} />
-          <CountUpItem label="DETECTED RISKS" targetValue={482} />
-          <CountUpItem label="REFERENCE CASES" targetValue={316} />
+          <CountUpItem
+            label="TOTAL ANALYSES"
+            targetValue={stats.total_analyses}
+          />
+
+          <CountUpItem
+            label="DETECTED RISKS"
+            targetValue={stats.total_danger}
+          />
+
+          <CountUpItem
+            label="ANALYZED SERVICES"
+            targetValue={stats.total_services}
+          />
         </div>
       </div>
     </section>
