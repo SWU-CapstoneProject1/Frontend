@@ -1,60 +1,79 @@
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { House, Archive, Sun, Moon } from 'lucide-react'
+
 import Tabs from '../ui/Tabs'
+import logoImg from '../../assets/images/logo_terms_agree.png'
 
 function Header() {
   const navigate = useNavigate()
   const location = useLocation()
-  
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+
   const navTabs = [
-    { id: 'dashboard', label: '대시보드', path: '/' },
-    { id: 'library', label: '보관함', path: '/library' },
-    { id: 'settings', label: '설정', path: '/settings' },
+    {
+      id: 'dashboard',
+      label: '홈',
+      icon: House,
+      path: '/',
+    },
+    {
+      id: 'library',
+      label: '보관함',
+      icon: Archive,
+      path: '/library',
+    },
   ]
 
-  // URL에 따라 활성 탭 자동 결정
   const getActiveTab = () => {
     const currentPath = location.pathname
-    
-    // 정확히 매칭되는 메인 탭 확인
-    const exactMatch = navTabs.find(tab => tab.path === currentPath)
+
+    const exactMatch = navTabs.find((tab) => tab.path === currentPath)
     if (exactMatch) return exactMatch.id
-    
-    // 부분 매칭 처리 (/library 등 하위 페이지 고려)
-    const partialMatch = navTabs.find(tab => 
-      tab.path !== '/' && currentPath.startsWith(tab.path)
+
+    const partialMatch = navTabs.find(
+      (tab) => tab.path !== '/' && currentPath.startsWith(tab.path)
     )
     if (partialMatch) return partialMatch.id
-    
-    
+
     if (currentPath.startsWith('/analysis')) return ''
-    
-    // 기본값
+
     return 'dashboard'
   }
 
   const handleNavChange = (id: string) => {
-    const tab = navTabs.find(t => t.id === id)
-    if (tab) {
-      navigate(tab.path)
-    }
+    const tab = navTabs.find((t) => t.id === id)
+    if (tab) navigate(tab.path)
   }
 
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
+  }
+
+  const isDark = theme === 'dark'
+
   return (
-    <header className="sticky top-0 z-50 px-6 py-4">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        
-        {/* 좌측: 로고 */}
-        <button 
+    <header className="fixed left-0 right-0 top-0 z-[999] border-b border-stone-200/70 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 transition-opacity hover:opacity-80"
         >
-          <div className="w-7 h-7 rounded-lg bg-ink flex items-center justify-center">
-            <span className="text-white text-xs font-bold">C</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-stone-100 border border-stone-200 overflow-hidden">
+            <img
+              src={logoImg}
+              alt="약간동의"
+              className="h-8 w-8 object-contain rounded-xl"
+            />
           </div>
-          <span className="font-semibold text-ink">Clause AI</span>
+
+          <div className="flex flex-col items-start leading-none">
+            <span className="text-sm font-black tracking-tight text-stone-950">
+              약간동의
+            </span>
+          </div>
         </button>
 
-        {/* 가운데: 네비게이션 탭 */}
         <Tabs
           items={navTabs}
           activeId={getActiveTab()}
@@ -62,11 +81,28 @@ function Header() {
           variant="pill"
         />
 
-        {/* 우측: 유저 아바타 */}
-        <button className="w-9 h-9 rounded-full bg-ink text-white text-sm font-semibold flex items-center justify-center hover:opacity-90 transition-opacity">
-          A
-        </button>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label="테마 변경"
+          className={`
+            relative flex h-10 w-10 items-center justify-center rounded-full
+            border transition-all duration-300
+            ${
+              isDark
+                ? 'border-indigo-200/70 bg-indigo-50 text-indigo-500 shadow-[0_8px_24px_rgba(99,102,241,0.16)]'
+                : 'border-amber-200/80 bg-amber-50 text-amber-500 shadow-[0_8px_24px_rgba(245,158,11,0.14)]'
+            }
+          `}
+        >
+          <span className="absolute inset-0 rounded-full bg-white/35" />
 
+          {isDark ? (
+            <Moon size={18} strokeWidth={2.4} className="relative z-10" />
+          ) : (
+            <Sun size={18} strokeWidth={2.4} className="relative z-10" />
+          )}
+        </button>
       </div>
     </header>
   )
