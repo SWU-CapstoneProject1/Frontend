@@ -10,7 +10,8 @@ import AnalysisHeader from '../../features/analysis/AnalysisHeader'
 import ClauseList from '../../features/analysis/ClauseList'
 import AiSidePanel from '../../features/analysis/AiSidePanel'
 
-import { getAnalysisReport, bookmarkAnalysis } from '../../api/analyses'
+import { getAnalysisReport } from '../../api/analyses'
+import { addBookmarkedJobId, isBookmarkedJob } from '../../utils/bookmarkStorage'
 import { ApiError } from '../../api/client'
 
 const POLL_INTERVAL_MS = 3000
@@ -30,13 +31,13 @@ function AnalysisPage() {
   const handleBookmark = async () => {
     if (!id) return
 
-    try {
-      await bookmarkAnalysis(id, 'testkey')
-      alert('보관함에 저장되었습니다!')
-    } catch (e) {
-      console.error(e)
-      alert('보관함 저장에 실패했습니다.')
+    if (isBookmarkedJob(id)) {
+      alert('이미 보관함에 저장된 리포트입니다.')
+      return
     }
+
+    addBookmarkedJobId(id)
+    alert('보관함에 저장되었습니다!')
   }
 
   const handleHoverClause = (clauseId: string | null) => {
@@ -110,24 +111,24 @@ function AnalysisPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
+      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-50">
         <Header />
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
-          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50">
-              <Loader2 size={26} className="animate-spin text-sky-600" />
+          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50 dark:bg-sky-500/10">
+              <Loader2 size={26} className="animate-spin text-sky-600 dark:text-sky-400" />
             </div>
 
-            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
               LOADING REPORT
             </span>
 
-            <h2 className="mt-3 text-2xl font-black text-stone-900">
+            <h2 className="mt-3 text-2xl font-black text-stone-900 dark:text-slate-50">
               분석 결과를 불러오는 중입니다
             </h2>
 
-            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500">
+            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500 dark:text-slate-400">
               잠시만 기다려주세요. 약관 분석 리포트를 준비하고 있습니다.
             </p>
           </div>
@@ -138,30 +139,30 @@ function AnalysisPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
+      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-50">
         <Header />
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
-          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
-              <AlertCircle size={26} className="text-red-600" />
+          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-500/10">
+              <AlertCircle size={26} className="text-red-600 dark:text-red-400" />
             </div>
 
-            <span className="text-[10px] font-black uppercase tracking-widest text-red-600">
+            <span className="text-[10px] font-black uppercase tracking-widest text-red-600 dark:text-red-400">
               ERROR
             </span>
 
-            <h2 className="mt-3 text-2xl font-black text-stone-900">
+            <h2 className="mt-3 text-2xl font-black text-stone-900 dark:text-slate-50">
               리포트를 불러오지 못했습니다
             </h2>
 
-            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500">
+            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500 dark:text-slate-400">
               {error}
             </p>
 
             <button
               onClick={() => navigate('/')}
-              className="mt-6 rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800"
+              className="mt-6 rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
             >
               홈으로 돌아가기
             </button>
@@ -173,30 +174,30 @@ function AnalysisPage() {
 
   if (!report) {
     return (
-      <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
+      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-50">
         <Header />
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
-          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100">
-              <FileSearch size={26} className="text-stone-500" />
+          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100 dark:bg-white/10">
+              <FileSearch size={26} className="text-stone-500 dark:text-slate-300" />
             </div>
 
-            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">
+            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400 dark:text-slate-500">
               NOT FOUND
             </span>
 
-            <h2 className="mt-3 text-2xl font-black text-stone-900">
+            <h2 className="mt-3 text-2xl font-black text-stone-900 dark:text-slate-50">
               분석 결과를 찾을 수 없습니다
             </h2>
 
-            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500">
+            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500 dark:text-slate-400">
               요청한 리포트가 없거나 아직 생성되지 않았습니다.
             </p>
 
             <button
               onClick={() => navigate('/')}
-              className="mt-6 rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800"
+              className="mt-6 rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
             >
               홈으로 돌아가기
             </button>
@@ -207,24 +208,24 @@ function AnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
+    <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-50">
       <Header />
 
       <main className="mx-auto max-w-6xl px-6 pt-24 pb-24">
         <div className="mb-7 flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
               REPORT DETAIL
             </span>
 
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-stone-900">
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-stone-900 dark:text-slate-50">
               약관 분석 결과
             </h1>
           </div>
 
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-black text-stone-500 shadow-[0_10px_25px_rgba(15,23,42,0.04)] transition hover:bg-stone-950 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-black text-stone-500 shadow-[0_10px_25px_rgba(15,23,42,0.04)] transition hover:bg-stone-950 hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:shadow-[0_10px_30px_rgba(0,0,0,0.25)] dark:hover:bg-white dark:hover:text-slate-950"
           >
             <ArrowLeft size={16} />
             홈으로
