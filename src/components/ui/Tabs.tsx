@@ -1,63 +1,85 @@
 interface TabItem {
-  id: string         // 내부 식별자
-  label: string      // 화면에 보이는 이름
+  id: string
+  label: string
+  icon?: any
 }
 
 interface TabsProps {
-  items: TabItem[]              // 탭 목록
-  activeId: string              // 현재 활성 탭의 id
-  onChange: (id: string) => void // 탭 클릭 시 호출되는 함수
+  items: TabItem[]
+  activeId: string
+  onChange: (id: string) => void
   variant?: 'pill' | 'underline'
 }
 
-function Tabs({ items, activeId, onChange, variant = 'pill' }: TabsProps) {
+function Tabs({
+  items,
+  activeId,
+  onChange,
+  variant = 'pill',
+}: TabsProps) {
   if (variant === 'pill') {
-    // 알약 모양 탭 (헤더 네비게이션용)
     return (
-      <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/40 backdrop-blur-md border border-white/50">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onChange(item.id)}
-            className={`
-              px-4 py-1.5 rounded-full text-sm font-medium
-              transition-all duration-200
-              ${activeId === item.id
-                ? 'bg-white text-ink shadow-sm'
-                : 'text-ink-soft hover:text-ink'
-              }
-            `}
-          >
-            {item.label}
-          </button>
-        ))}
+      <div className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-100/80 p-1 transition-colors duration-300 dark:border-white/10 dark:bg-white/5">
+        {items.map((item) => {
+          const isActive = activeId === item.id
+          const Icon = item.icon
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => onChange(item.id)}
+              className={`
+                flex items-center gap-2 rounded-full px-4 py-2
+                text-sm font-bold transition-all duration-200
+                ${
+                  isActive
+                    ? 'bg-white text-stone-950 shadow-sm dark:bg-white/15 dark:text-slate-50'
+                    : 'text-stone-500 hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-50'
+                }
+              `}
+            >
+              {Icon && (
+                <Icon
+                  size={16}
+                  strokeWidth={2.3}
+                />
+              )}
+
+              {item.label}
+            </button>
+          )
+        })}
       </div>
     )
   }
 
-  // 밑줄 탭 (입력 모드용)
   return (
-    <div className="flex items-center gap-4 border-b border-stone-200">
-      {items.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => onChange(item.id)}
-          className={`
-            px-2 py-2 text-sm font-medium relative
-            transition-colors duration-200
-            ${activeId === item.id
-              ? 'text-ink'
-              : 'text-ink-soft hover:text-ink'
-            }
-          `}
-        >
-          {item.label}
-          {/* 활성 탭에만 밑줄 표시 */}
-          {activeId === item.id && (
-            <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-ink" />
-          )}
-        </button>
-      ))}
+    <div className="flex items-center gap-4 border-b border-stone-200 transition-colors duration-300 dark:border-white/10">
+      {items.map((item) => {
+        const isActive = activeId === item.id
+
+        return (
+          <button
+            key={item.id}
+            onClick={() => onChange(item.id)}
+            className={`
+              relative px-2 py-2 text-sm font-bold
+              transition-colors duration-200
+              ${
+                isActive
+                  ? 'text-stone-950 dark:text-slate-50'
+                  : 'text-stone-500 hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-50'
+              }
+            `}
+          >
+            {item.label}
+
+            {isActive && (
+              <span className="absolute -bottom-px left-0 right-0 h-0.5 bg-stone-950 dark:bg-sky-400" />
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }
