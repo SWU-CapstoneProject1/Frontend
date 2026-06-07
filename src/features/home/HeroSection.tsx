@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import glassChainImg from '../../assets/images/glass_chain_v2.png'
+import darkGlassChainImg from '../../assets/images/dark_chain.png'
 
 interface HeroSectionProps {
   onScrollToInput?: () => void
@@ -49,11 +50,33 @@ function HeroSection({ onScrollToInput }: HeroSectionProps) {
       <div className="pointer-events-none absolute right-0 top-0 z-0 flex h-full w-[65%] items-center justify-end overflow-hidden">
         <div className="absolute inset-0 z-10 h-full w-full bg-gradient-to-r from-white via-white via-[15%] to-transparent transition-colors duration-300 dark:from-slate-950 dark:via-slate-950 dark:to-transparent" />
 
-        <img
-          src={glassChainImg}
-          alt=""
-          className="h-full w-full origin-center translate-x-[18%] scale-135 select-none object-cover object-center opacity-100 pointer-events-none dark:opacity-70"
-        />
+        <>
+          {/* 라이트모드 */}
+          <img
+            src={glassChainImg}
+            alt=""
+            className="
+              pointer-events-none h-full w-full origin-center
+              translate-x-[18%] scale-135 select-none
+              object-cover object-center
+              opacity-100 transition-all duration-500
+              dark:hidden
+            "
+          />
+
+          {/* 다크모드 */}
+          <img
+            src={darkGlassChainImg}
+            alt=""
+            className="
+              pointer-events-none hidden h-full w-full origin-center
+              translate-x-[18%] scale-135 select-none
+              object-cover object-center
+              opacity-80 transition-all duration-500
+              dark:block
+            "
+          />
+        </>
       </div>
 
       <motion.div
