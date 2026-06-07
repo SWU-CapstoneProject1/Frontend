@@ -1,66 +1,64 @@
+import { Scale, ExternalLink } from 'lucide-react'
 import type { AnalysisCase } from '../../types'
 
 interface CaseCardProps {
   caseData: AnalysisCase
-  isDark?: boolean 
-  isSidePanel?: boolean 
+  isDark?: boolean
+  isSidePanel?: boolean
   onViewOriginal?: () => void
 }
 
-function CaseCard({ caseData, isDark = false, isSidePanel = false, onViewOriginal }: CaseCardProps) {
-  // 정규식으로 사건번호와 사건명 추출
+function CaseCard({
+  caseData,
+  isSidePanel = false,
+  onViewOriginal,
+}: CaseCardProps) {
   const caseNoMatch = caseData.result.match(/사건번호\s*:\s*([^\s]+)/)
   const caseNameMatch = caseData.result.match(/사건명\s*:\s*([^피심인\n]+)/)
 
-  const caseNo = caseNoMatch ? caseNoMatch[1] : '판례 정보'
+  const caseNo = caseNoMatch ? caseNoMatch[1] : caseData.title
   const caseName = caseNameMatch ? caseNameMatch[1].trim() : caseData.title
 
   return (
-    <div
-      className="p-3.5 rounded-xl transition-all duration-300 flex flex-col gap-1.5 text-left"
-      style={{
-        background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
-        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)'}`,
-      }}
-    >
-      {/* 상단부: 사건번호 배지 + 일치율 퍼센트 */}
-      <div className="flex items-center justify-between">
-        <span 
-          className={`px-2 py-0.5 rounded-md text-[0.65rem] font-bold transition-colors duration-300 ${
-            isDark ? 'bg-white/10 text-white/80' : 'bg-black/5 text-black/60'
-          }`}
-        >
-          {caseNo}
-        </span>
-        <span 
-          className={`text-[0.65rem] font-semibold transition-colors duration-300 ${
-            isDark ? 'text-white/40' : 'text-black/40'
-          }`}
-        >
+    <div className="rounded-[20px] border border-stone-200 bg-white p-4 text-left shadow-[0_10px_28px_rgba(15,23,42,0.04)] transition hover:border-sky-100 hover:shadow-[0_14px_32px_rgba(14,165,233,0.08)]">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sky-50">
+            <Scale size={16} className="text-sky-600" />
+          </div>
+
+          <span className="truncate rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-black text-stone-500">
+            {caseNo}
+          </span>
+        </div>
+
+        <span className="shrink-0 text-[10px] font-black text-sky-600">
           {caseData.relevance}% {isSidePanel ? '' : '일치'}
         </span>
       </div>
 
-      {/* 사건명 타이틀 */}
-      <h5 
-        className={`text-xs font-bold transition-colors duration-300 leading-snug ${
-          isSidePanel ? 'text-white/85 line-clamp-2' : '' // 💡 사이드 패널일 땐 좁으니까 두 줄까지만 나오게 제한!
+      <h5
+        className={`text-sm font-black leading-snug text-stone-900 ${
+          isSidePanel ? 'line-clamp-2' : ''
         }`}
-        style={isSidePanel ? {} : { color: isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.75)' }}
       >
         {caseName}
       </h5>
 
-      {/* 사이드 패널이 아닐 때만 원문 전체를 노출 */}
       {!isSidePanel && (
-        <p
-          className="text-xs leading-relaxed mt-1 transition-colors duration-300 font-medium whitespace-pre-wrap"
-          style={{ 
-            color: isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(0, 0, 0, 0.6)' 
-          }}
-        >
+        <p className="mt-2 whitespace-pre-wrap text-xs font-bold leading-relaxed text-stone-500">
           {caseData.result}
         </p>
+      )}
+
+      {onViewOriginal && (
+        <button
+          onClick={onViewOriginal}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-[10px] font-black text-stone-500 transition hover:bg-sky-50 hover:text-sky-600"
+        >
+          원문 보기
+          <ExternalLink size={12} />
+        </button>
       )}
     </div>
   )

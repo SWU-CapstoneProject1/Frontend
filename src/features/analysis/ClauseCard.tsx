@@ -1,13 +1,14 @@
 import { useState } from 'react'
+import { ChevronDown, Scale, Sparkles } from 'lucide-react'
 import type { AnalysisClause } from '../../types'
 import Badge from '../../components/ui/Badge'
 import CaseCard from './CaseCard'
 
 interface ClauseCardProps {
   clause: AnalysisClause
-  onHover: (id: string | null) => void 
-  expandedId: string | null 
-  onToggleExpand: (id: string | null) => void 
+  onHover: (id: string | null) => void
+  expandedId: string | null
+  onToggleExpand: (id: string | null) => void
 }
 
 const riskLabels = {
@@ -16,7 +17,18 @@ const riskLabels = {
   danger: '위험',
 }
 
-function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardProps) {
+const riskTextColors = {
+  safe: 'text-green-600',
+  warning: 'text-amber-600',
+  danger: 'text-red-600',
+}
+
+function ClauseCard({
+  clause,
+  onHover,
+  expandedId,
+  onToggleExpand,
+}: ClauseCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expandedId === clause.id
 
@@ -37,105 +49,89 @@ function ClauseCard({ clause, onHover, expandedId, onToggleExpand }: ClauseCardP
       onMouseLeave={handleMouseLeave}
       id={`clause-card-${clause.id}`}
     >
-      {/* 배경 장식 번호 */}
       <div
-        className="absolute -left-2 -top-4 pointer-events-none select-none z-0 text-[5rem] font-black leading-none tracking-tighter transition-all duration-300"
-        style={{
-          opacity: isHovered ? 0.06 : 0.02,
-          color: isHovered ? 'rgba(255,255,255,1)' : 'rgba(0,0,0,1)',
-          transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-        }}
-      >
-        {String(clause.num).padStart(2, '0')}
-      </div>
-
-      {/* 카드 본체 */}
-      <div
-        className="relative z-10 p-6 rounded-3xl cursor-pointer overflow-hidden transition-all duration-300"
-        style={{
-          background: isHovered ? 'rgba(20,20,22,0.65)' : 'rgba(255,255,255,0.22)',
-          border: `1px solid ${isHovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.45)'}`,
-          backdropFilter: 'blur(40px) saturate(1.4)',
-          WebkitBackdropFilter: 'blur(40px) saturate(1.4)',
-          boxShadow: isHovered
-            ? '0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)'
-            : '0 8px 32px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.5)',
-        }}
+        className={`
+          relative cursor-pointer overflow-hidden rounded-[30px]
+          border bg-white p-6
+          shadow-[0_16px_40px_rgba(15,23,42,0.05)]
+          transition-all duration-300
+          ${
+            isHovered
+              ? 'border-sky-200 shadow-[0_20px_50px_rgba(14,165,233,0.10)]'
+              : 'border-stone-200'
+          }
+        `}
         onClick={() => onToggleExpand(isExpanded ? null : clause.id)}
       >
-        <div className="flex items-start gap-4">
-          {/* 좌측: 조항 번호 + 위험도 뱃지 */}
-          <div className="shrink-0 pt-0.5">
-            <p
-              className="text-[0.55rem] font-semibold tracking-widest uppercase mb-1.5"
-              style={{ color: isHovered ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.18)' }}
-            >
+        <div className="pointer-events-none absolute right-6 top-4 text-6xl font-black tracking-tighter text-stone-100">
+          {String(clause.num).padStart(2, '0')}
+        </div>
+
+        <div className="relative z-10 flex items-start gap-4">
+          <div className="shrink-0">
+            <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-sky-600">
               ARTICLE {clause.num}
             </p>
+
             <Badge level={clause.risk} showDot>
               {riskLabels[clause.risk]}
             </Badge>
           </div>
 
-          {/* 중앙: 제목 + 원문 텍스트 */}
-          <div className="flex-1 min-w-0">
-          
-            <h4
-              className="text-base font-bold mb-1.5 transition-colors duration-300"
-              style={{ color: isHovered ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.75)' }}
-            >
+          <div className="min-w-0 flex-1">
+            <h4 className="mb-2 text-base font-black text-stone-900">
               {clause.title}
             </h4>
-            
+
             <p
-              className={`text-sm leading-relaxed transition-colors duration-300 whitespace-pre-wrap ${!isExpanded ? 'line-clamp-2' : ''}`}
-              style={{ color: isHovered ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.55)' }}
+              className={`whitespace-pre-wrap text-sm font-bold leading-relaxed text-stone-500 ${
+                !isExpanded ? 'line-clamp-2' : ''
+              }`}
             >
               {clause.text}
             </p>
           </div>
 
-          {/* 우측: 화살표 아이콘 */}
-          <span
-            className="shrink-0 mt-1 text-sm transition-all duration-300"
-            style={{
-              color: isHovered ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.12)',
-              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              display: 'inline-block',
-            }}
-          >
-            ▾
-          </span>
+          <ChevronDown
+            size={20}
+            className={`mt-1 shrink-0 text-stone-300 transition-transform duration-300 ${
+              isExpanded ? 'rotate-180' : ''
+            }`}
+          />
         </div>
 
-        {/* 펼쳐지는 영역 */}
         {isExpanded && (
-          <div
-            className="mt-5 pt-5"
-            style={{ borderTop: `1px solid ${isHovered ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'}` }}
-          >
-            <div className="flex items-center gap-1.5 mb-3">
-              <span style={{ color: isHovered ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)' }}>⚖</span>
-              <span
-                className="text-xs font-bold"
-                style={{ color: isHovered ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)' }}
-              >
-                이 조항의 위반 관련 판례 사례
+          <div className="relative z-10 mt-6 border-t border-stone-200 pt-6">
+            <div className="mb-4 rounded-[22px] border border-sky-100 bg-sky-50/60 p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Sparkles size={16} className="text-sky-600" />
+                <span className="text-xs font-black text-sky-600">
+                  AI 분석 요약
+                </span>
+              </div>
+
+              <p className="text-sm font-bold leading-relaxed text-stone-600">
+                {clause.aiSummary || 'AI 요약 정보가 없습니다.'}
+              </p>
+            </div>
+
+            <div className="mb-3 flex items-center gap-2">
+              <Scale size={16} className="text-sky-600" />
+              <span className="text-xs font-black text-stone-500">
+                관련 판례
               </span>
             </div>
-            
+
             {clause.cases && clause.cases.length > 0 ? (
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-3">
                 {clause.cases.map((c) => (
-                  <CaseCard 
-                    key={c.title} 
-                    caseData={c} 
-                    isDark={isHovered} 
-                  />
+                  <CaseCard key={c.title} caseData={c} />
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-ink-soft">연관된 판례 내역이 없습니다.</p>
+              <p className="text-xs font-bold text-stone-400">
+                연관된 판례 내역이 없습니다.
+              </p>
             )}
           </div>
         )}

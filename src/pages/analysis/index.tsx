@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { ArrowLeft, AlertCircle, Loader2, FileSearch } from 'lucide-react'
 
 import type { AnalysisClause, AnalysisReport } from '../../types'
 
@@ -22,14 +23,13 @@ function AnalysisPage() {
   const [hoveredClauseId, setHoveredClauseId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
-  // 마우스 지연 처리를 위한 타이머 ref
-  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // 어떤 조항 카드가 드롭다운으로 펼쳐져 있는지 관리하는 상태
   const [expandedClauseId, setExpandedClauseId] = useState<string | null>(null)
+
+  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleBookmark = async () => {
     if (!id) return
+
     try {
       await bookmarkAnalysis(id, 'testkey')
       alert('보관함에 저장되었습니다!')
@@ -39,7 +39,6 @@ function AnalysisPage() {
     }
   }
 
-  // 마우스 호버 상태를 스마트하게 제어하는 함수
   const handleHoverClause = (clauseId: string | null) => {
     if (leaveTimerRef.current) {
       clearTimeout(leaveTimerRef.current)
@@ -48,24 +47,20 @@ function AnalysisPage() {
 
     if (clauseId) {
       setHoveredClauseId(clauseId)
-    } else {
-      leaveTimerRef.current = setTimeout(() => {
-        setHoveredClauseId(null)
-      }, 100)
+      return
     }
+
+    leaveTimerRef.current = setTimeout(() => {
+      setHoveredClauseId(null)
+    }, 100)
   }
 
-
   const handleViewOriginal = (clauseId: string) => {
-    // 1. 해당 조항 카드를 활성화
     setExpandedClauseId(clauseId)
-    
-    // 2. 펼쳐진 왼쪽 카드 위치로 부드럽게 화면을 스크롤링 
+
     setTimeout(() => {
       const element = document.getElementById(`clause-card-${clauseId}`)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 50)
   }
 
@@ -83,13 +78,18 @@ function AnalysisPage() {
     const fetchReport = async () => {
       try {
         const data = await getAnalysisReport(id)
+
         if (data) {
           setReport(data)
           setIsLoading(false)
           clearInterval(intervalId)
         }
       } catch (e) {
-        const message = e instanceof ApiError ? e.message : '분석 결과를 불러오지 못했습니다.'
+        const message =
+          e instanceof ApiError
+            ? e.message
+            : '분석 결과를 불러오지 못했습니다.'
+
         setError(message)
         setIsLoading(false)
         clearInterval(intervalId)
@@ -108,85 +108,148 @@ function AnalysisPage() {
   const hoveredClause: AnalysisClause | null =
     report?.clauses.find((c) => c.id === hoveredClauseId) ?? null
 
-  // 1. 로딩 상태 뷰
   if (isLoading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
         <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-ink-soft text-sm">분석 중...</p>
-        </div>
+
+        <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
+          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50">
+              <Loader2 size={26} className="animate-spin text-sky-600" />
+            </div>
+
+            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+              LOADING REPORT
+            </span>
+
+            <h2 className="mt-3 text-2xl font-black text-stone-900">
+              분석 결과를 불러오는 중입니다
+            </h2>
+
+            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500">
+              잠시만 기다려주세요. 약관 분석 리포트를 준비하고 있습니다.
+            </p>
+          </div>
+        </main>
       </div>
     )
   }
 
-  // 2. 에러 발생 상태 뷰
   if (error) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
         <Header />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <p className="text-red-400 text-sm">{error}</p>
-          <button onClick={() => navigate('/')} className="text-xs text-ink hover:underline">
-            홈으로 돌아가기
-          </button>
-        </div>
+
+        <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
+          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
+              <AlertCircle size={26} className="text-red-600" />
+            </div>
+
+            <span className="text-[10px] font-black uppercase tracking-widest text-red-600">
+              ERROR
+            </span>
+
+            <h2 className="mt-3 text-2xl font-black text-stone-900">
+              리포트를 불러오지 못했습니다
+            </h2>
+
+            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500">
+              {error}
+            </p>
+
+            <button
+              onClick={() => navigate('/')}
+              className="mt-6 rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800"
+            >
+              홈으로 돌아가기
+            </button>
+          </div>
+        </main>
       </div>
     )
   }
 
-  // 3. 데이터를 찾을 수 없는 상태 뷰
   if (!report) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
         <Header />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <p className="text-ink-soft text-sm">분석 결과를 찾을 수 없습니다.</p>
-          <button onClick={() => navigate('/')} className="text-xs text-ink hover:underline">
-            홈으로 돌아가기
-          </button>
-        </div>
+
+        <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
+          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100">
+              <FileSearch size={26} className="text-stone-500" />
+            </div>
+
+            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">
+              NOT FOUND
+            </span>
+
+            <h2 className="mt-3 text-2xl font-black text-stone-900">
+              분석 결과를 찾을 수 없습니다
+            </h2>
+
+            <p className="mt-3 text-sm font-bold leading-relaxed text-stone-500">
+              요청한 리포트가 없거나 아직 생성되지 않았습니다.
+            </p>
+
+            <button
+              onClick={() => navigate('/')}
+              className="mt-6 rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800"
+            >
+              홈으로 돌아가기
+            </button>
+          </div>
+        </main>
       </div>
     )
   }
 
-  // 4. 정상적인 분석 완료 화면 뷰
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F7F7F8] text-stone-900 font-['Pretendard']">
       <Header />
-      <main className="max-w-6xl mx-auto px-6 pt-24 pb-20">
-        {/* 생략되었던 상단 뒤로가기 바 복구 */}
-        <div className="flex items-center gap-3 mb-6">
+
+      <main className="mx-auto max-w-6xl px-6 pt-24 pb-24">
+        <div className="mb-7 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+              REPORT DETAIL
+            </span>
+
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-stone-900">
+              약관 분석 결과
+            </h1>
+          </div>
+
           <button
             onClick={() => navigate('/')}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-ink-soft hover:text-ink transition-colors"
-            style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}
+            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-black text-stone-500 shadow-[0_10px_25px_rgba(15,23,42,0.04)] transition hover:bg-stone-950 hover:text-white"
           >
-            ←
+            <ArrowLeft size={16} />
+            홈으로
           </button>
-          <span className="text-xs text-ink-soft">약관 분석 결과</span>
         </div>
 
         <AnalysisHeader report={report} onBookmark={handleBookmark} />
 
         <div className="flex gap-6">
-          {/* 왼쪽 리스트: 펼쳐짐 상태 제어 프롭스 연결 */}
-          <ClauseList 
-            clauses={report.clauses} 
-            onHoverClause={handleHoverClause} 
+          <ClauseList
+            clauses={report.clauses}
+            onHoverClause={handleHoverClause}
             expandedId={expandedClauseId}
             onToggleExpand={setExpandedClauseId}
           />
-          
-          {/* 오른쪽 패널: 원문보기 링크 이벤트 연결 */}
-          <AiSidePanel 
-            report={report} 
-            hoveredClause={hoveredClause} 
-            onHoverPanel={handleHoverClause} 
+
+          <AiSidePanel
+            report={report}
+            hoveredClause={hoveredClause}
+            onHoverPanel={handleHoverClause}
             onViewOriginal={handleViewOriginal}
           />
         </div>
       </main>
+
       <Footer />
     </div>
   )
