@@ -1,13 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-
-const textTips = [
-  "공정거래위원회 표준약관과 다른 불리한 조항을 꼼꼼히 탐색하고 있습니다.",
-  "고객에게 과도한 위약금을 부과하는 조항은 약관규제법상 무효 사유가 됩니다.",
-  "AI가 대법원 판례 데이터를 기반으로 독소 문구의 위반 여부를 대조하는 중입니다.",
-  "거의 다 되었습니다! 종합 위험도 스코어를 산출하고 리포트를 가공하고 있습니다."
-]
+import { getAnalysisProgress } from '../../api/analyses'
+import type { AnalysisProgress } from '../../api/analyses'
 
 interface AnalysisLoadingPageProps {
   analysisPromise: Promise<string>
@@ -15,167 +10,166 @@ interface AnalysisLoadingPageProps {
 
 function AnalysisLoadingPage({ analysisPromise }: AnalysisLoadingPageProps) {
   const navigate = useNavigate()
+
+  const [jobId, setJobId] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
-  const [tipIndex, setTipIndex] = useState(0)
+  const [message, setMessage] = useState('분석 작업을 준비하고 있습니다.')
+  const [stage, setStage] = useState('queued')
+  const [currentInfo, setCurrentInfo] = useState<AnalysisProgress | null>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    let realJobId: string | null = null
-    let currentProgress = 0
-
     analysisPromise
       .then((id) => {
-        realJobId = id
-        if (currentProgress >= 90) {
-          triggerFinalJump(id)
-        }
+        console.log('받은 job_id:', id)
+        setJobId(id)
       })
       .catch((err) => {
         console.error(err)
-        alert('분석 도중 오류가 발생했습니다.')
-        window.location.href = '/'
+        setError('분석 시작 중 오류가 발생했습니다.')
       })
+  }, [analysisPromise])
 
-    
-    const triggerFinalJump = (targetId: string) => {
-      setProgress(100) 
-      
-      // 바로 넘기지 않고 1.5초(1500ms) 동안 대기
-      setTimeout(() => {
-        navigate(`/analysis/${targetId}`)
-      }, 1500) 
-    }
+  useEffect(() => {
+    if (!jobId) return
 
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        currentProgress = prev
-        if (realJobId) {
-          if (prev >= 99) {
-            clearInterval(timer)
-            triggerFinalJump(realJobId)
-            return 100
-          }
-          return prev + 2
+    const poll = async () => {
+      try {
+        const data = await getAnalysisProgress(jobId)
+
+        console.log('실시간 진행률 응답:', data)
+        setCurrentInfo(data)
+        setProgress(data.progress_percent ?? 0)
+        setStage(data.stage)
+        setMessage(data.message || '분석을 진행하고 있습니다.')
+
+        if (data.status === 'done' || data.status === 'completed') {
+          setProgress(100)
+          setMessage('분석이 완료되었습니다. 리포트로 이동합니다.')
+
+          setTimeout(() => {
+            navigate(`/analysis/${jobId}`)
+          }, 900)
         }
-        if (prev >= 90) return 90
-        return prev + 1
-      })
-    }, 70)
 
-    const textTimer = setInterval(() => {
-      setTipIndex((prev) => (prev + 1) % textTips.length)
-    }, 3000)
-
-    return () => {
-      clearInterval(timer)
-      clearInterval(textTimer)
+        if (data.status === 'failed') {
+          setError(data.message || '분석 도중 오류가 발생했습니다.')
+        }
+      } catch (err) {
+        console.error(err)
+        setError('진행률을 불러오는 중 오류가 발생했습니다.')
+      }
     }
-  }, [analysisPromise, navigate])
+
+    poll()
+    const timer = setInterval(poll, 900)
+
+    return () => clearInterval(timer)
+  }, [jobId, navigate])
+
+  const stageLabel: Record<string, string> = {
+    queued: '분석 대기 중',
+    extracting_url: 'URL 본문 추출 중',
+    extracting_file: '파일 텍스트 추출 중',
+    preparing: '분석 준비 중',
+    splitting: '약관 조항 분리 중',
+    classifying: '위험도 분류 중',
+    retrieving_precedents: '관련 판례 검색 중',
+    generating_explanation: 'AI 설명 생성 중',
+    summarizing: '전체 요약 계산 중',
+    saving: '결과 저장 중',
+    completed: '완료',
+    failed: '실패',
+  }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#eef5f9] text-stone-800 font-['Pretendard'] flex flex-col justify-between p-12 overflow-hidden select-none">
-      
-      {/*  상단 네비 */}
-      <header className="w-full max-w-7xl mx-auto flex justify-between items-center opacity-60 z-20">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-black tracking-widest text-sky-600">YAKGAN DONGUI</span>
-          <span className="text-[9px] font-bold bg-white/80 text-sky-700 px-1.5 py-0.5 rounded shadow-xs border border-white">AI SCAN ENGINE v2.0</span>
-        </div>
-        <span className="text-[10px] font-bold tracking-widest text-sky-600/70">DEEP SCANNING MODE ACTIVE</span>
-      </header>
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-[#F7F7F8] px-6 font-['Pretendard']">
+      <div className="w-full max-w-2xl rounded-[34px] border border-stone-200 bg-white p-9 shadow-[0_30px_90px_rgba(15,23,42,0.10)]">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+              ANALYSIS IN PROGRESS
+            </span>
 
-      {/* 실시간 오션 블루 멀티 파도 레이어 */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 transition-all duration-100 ease-out z-0"
-        style={{ height: `${progress}%` }}
-      >
-        {/* [Back Layer] 뒤쪽 파도 모핑 */}
-        <div className="absolute -top-20 left-0 right-0 h-24 opacity-30 pointer-events-none">
-          <svg className="w-full h-full fill-current text-sky-400/40" viewBox="0 0 1440 120" preserveAspectRatio="none">
-            <motion.path 
-              animate={{
-                d: [
-                  "M0,60 C360,10, 720,110, 1080,40 C1260,5, 1380,35, 1440,50 L1440,120 L0,120 Z",
-                  "M0,40 C400,100, 800,20, 1100,70 C1280,95, 1390,45, 1440,30 L1440,120 L0,120 Z",
-                  "M0,60 C360,10, 720,110, 1080,40 C1260,5, 1380,35, 1440,50 L1440,120 L0,120 Z"
-                ]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+            <h1 className="mt-3 text-3xl font-black tracking-tight text-stone-900">
+              약관을 분석하고 있습니다
+            </h1>
+          </div>
+
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50">
+            <motion.div
+              className="h-5 w-5 rounded-full bg-sky-500"
+              animate={{ scale: [1, 1.35, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.2, repeat: Infinity }}
             />
-          </svg>
-        </div>
-
-        {/* [Front Layer] 전면 메인 오션 파도 모핑 */}
-        <div className="absolute -top-16 left-0 right-0 h-20 opacity-50 pointer-events-none">
-          <svg className="w-full h-full fill-current text-cyan-400/60" viewBox="0 0 1440 120" preserveAspectRatio="none">
-            <motion.path 
-              animate={{
-                d: [
-                  "M0,40 C300,90, 600,10, 900,70 C1150,120, 1320,50, 1440,30 L1440,120 L0,120 Z",
-                  "M0,70 C350,20, 700,100, 1050,30 C1250,-10, 1380,40, 1440,60 L1440,120 L0,120 Z",
-                  "M0,40 C300,90, 600,10, 900,70 C1150,120, 1320,50, 1440,30 L1440,120 L0,120 Z"
-                ]
-              }}
-              transition={{
-                duration: 3.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </svg>
-        </div>
-
-        {/* 🔹 물 본체 액체 그라데이션 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-sky-400/35 via-cyan-300/25 to-sky-200/20" />
-      </div>
-
-      {/* 전면 프로스트 유리 마스크 패널 */}
-      <div className="absolute inset-0 bg-white/[0.02] backdrop-blur-[4px] pointer-events-none z-5" />
-
-      {/* 완벽 투명 글래스모피즘 숫자 */}
-      <main className="relative z-10 flex flex-col items-center justify-center flex-1 text-center my-auto">
-        <div className="space-y-6 max-w-xl">
-          
-          <h1 
-            className="text-[10rem] font-black tracking-tighter leading-none select-none drop-shadow-[0_8px_32px_rgba(14,116,144,0.05)] text-transparent bg-clip-text"
-            style={{
-              backgroundImage: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35))',
-              backdropFilter: 'blur(3px)',
-              WebkitBackdropFilter: 'blur(3px)',
-              WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.7)',
-            }}
-          >
-            {progress}%
-          </h1>
-          
-          {/* 하단 정보 캡슐 */}
-          <div className="inline-block bg-white/70 backdrop-blur-xl px-5 py-2 rounded-2xl border border-white/90 shadow-xs">
-            <p className="text-xs font-black tracking-wider text-sky-600 transition-all duration-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-ping" />
-              {progress === 100 
-                ? "✨ 분석 완료! 리포트를 구성합니다." 
-                : progress >= 90 
-                  ? "AI 엔진이 최종 리포트를 정밀 조율 중입니다..." 
-                  : "약관 조항 가동 및 판례 대조 스캔 중..."
-              }
-            </p>
           </div>
         </div>
-      </main>
 
-      {/* 하단 브리핑 자막 라인 */}
-      <footer className="relative z-10 w-full max-w-2xl mx-auto text-center border-t border-sky-900/5 pt-6">
-        <span className="text-[9px] font-black tracking-widest text-sky-600/40 uppercase block mb-2">
-          ANALYSIS STEP BRIEFING
-        </span>
-        <p className="text-xs text-stone-600 font-bold leading-relaxed max-w-md mx-auto h-8 transition-all duration-500">
-          "{textTips[tipIndex]}"
-        </p>
-      </footer>
+        <div className="mb-4 flex items-end justify-between">
+          <div>
+            <p className="text-sm font-black text-stone-900">
+              {stageLabel[stage] ?? '분석 진행 중'}
+            </p>
 
+            <p className="mt-2 text-sm font-bold leading-relaxed text-stone-500">
+              {error || message}
+            </p>
+          </div>
+
+          <span className="text-4xl font-black tracking-tight text-stone-900">
+            {Math.min(progress, 100)}%
+          </span>
+        </div>
+
+        <div className="h-4 overflow-hidden rounded-full bg-stone-100">
+          <motion.div
+            className="h-full rounded-full bg-sky-500"
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.min(progress, 100)}%` }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+          />
+        </div>
+
+        {currentInfo?.total_clauses &&
+        currentInfo.total_clauses > 0 &&
+        currentInfo.current_clause &&
+        currentInfo.current_clause > 0 && (
+          <div className="mt-6 rounded-[24px] border border-stone-200 bg-[#FAFAFA] p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-sky-600">
+                CLAUSE SCAN
+              </span>
+
+              <span className="text-xs font-black text-stone-400">
+                {currentInfo.current_clause} / {currentInfo.total_clauses}
+              </span>
+            </div>
+
+            {currentInfo.current_clause_title && (
+              <h3 className="mt-3 text-base font-black text-stone-900">
+                {currentInfo.current_clause_title}
+              </h3>
+            )}
+
+            {currentInfo.current_clause_preview && (
+              <p className="mt-2 line-clamp-2 text-sm font-bold leading-relaxed text-stone-500">
+                {currentInfo.current_clause_preview}
+              </p>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-7 flex justify-end">
+            <button
+              onClick={() => navigate('/')}
+              className="rounded-[20px] bg-stone-950 px-6 py-3 text-sm font-black text-white transition hover:bg-stone-800"
+            >
+              홈으로 돌아가기
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
