@@ -19,17 +19,17 @@ function ClauseList({
     <div className="min-w-0 flex-1">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+          <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
             CLAUSE ANALYSIS
           </span>
 
-          <h3 className="mt-2 flex items-center gap-2 text-xl font-black text-stone-900">
-            <FileText size={20} className="text-sky-600" />
+          <h3 className="mt-2 flex items-center gap-2 text-xl font-black text-stone-900 dark:text-slate-50">
+            <FileText size={20} className="text-sky-600 dark:text-sky-400" />
             약관 조항 분석
           </h3>
         </div>
 
-        <span className="rounded-full bg-stone-100 px-3 py-1.5 text-xs font-black text-stone-500">
+        <span className="rounded-full bg-stone-100 px-3 py-1.5 text-xs font-black text-stone-500 transition-colors duration-300 dark:bg-white/10 dark:text-slate-300">
           총 {clauses.length}개
         </span>
       </div>
