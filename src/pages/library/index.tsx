@@ -104,13 +104,13 @@ function LibraryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard']">
+      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] transition-colors duration-300 dark:bg-slate-950">
         <Header />
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
-          <div className="rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
-            <Loader2 size={28} className="mx-auto mb-4 animate-spin text-sky-600" />
-            <p className="text-sm font-bold text-stone-500">
+          <div className="rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
+            <Loader2 size={28} className="mx-auto mb-4 animate-spin text-sky-600 dark:text-sky-400" />
+            <p className="text-sm font-bold text-stone-500 dark:text-slate-400">
               보관함을 불러오는 중입니다...
             </p>
           </div>
@@ -121,13 +121,13 @@ function LibraryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard']">
+      <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] transition-colors duration-300 dark:bg-slate-950">
         <Header />
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
-          <div className="rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)]">
-            <AlertCircle size={28} className="mx-auto mb-4 text-red-500" />
-            <p className="text-sm font-bold text-red-500">{error}</p>
+          <div className="rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
+            <AlertCircle size={28} className="mx-auto mb-4 text-red-500 dark:text-red-400" />
+            <p className="text-sm font-bold text-red-500 dark:text-red-400">{error}</p>
           </div>
         </main>
       </div>
@@ -135,7 +135,7 @@ function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] text-stone-900">
+    <div className="min-h-screen bg-[#F7F7F8] font-['Pretendard'] text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-50">
       <Header />
 
       <main className="mx-auto max-w-6xl px-6 pb-24">
