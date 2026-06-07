@@ -39,6 +39,8 @@ interface ApiAnalysisResult {
   precedents: ApiPrecedent[]
 }
 
+
+
 // ── API 응답 → 프론트 타입 변환  ───────────────────────────
 function mapToAnalysisReport(data: ApiAnalysisResult): AnalysisReport {
   return {
@@ -71,6 +73,8 @@ function mapToAnalysisReport(data: ApiAnalysisResult): AnalysisReport {
     })),
   }
 }
+
+
 
 // ── API 함수들 ────────────────────────────────────────────
 /**
@@ -194,4 +198,43 @@ export async function bookmarkAnalysis(job_id: string, session_key: string): Pro
     job_id,
     session_key,
   })
+}
+
+
+// ── 진행률 조회 타입 ──────────────────────────────────────
+
+export interface AnalysisProgress {
+  job_id: string
+  status: 'queued' | 'running' | 'done' | 'completed' | 'failed'
+  progress_percent: number
+  stage: string
+  message: string
+
+  current_clause?: number
+  total_clauses?: number
+
+  current_clause_title?: string
+  current_clause_preview?: string
+}
+
+/**
+ * 분석 진행률 조회
+ *
+ * 백엔드에서 현재 분석 상태를 실시간으로 반환합니다.
+ * 프론트에서는 이 API를 주기적으로 폴링하여
+ * 로딩바 / 진행률 / 현재 분석 문구를 갱신합니다.
+ *
+ * 사용 예시:
+ * const progress = await getAnalysisProgress(job_id)
+ *
+ * progress.progress_percent → 로딩바 퍼센트
+ * progress.message → 현재 작업 메시지
+ * progress.stage → 현재 분석 단계
+ */
+export async function getAnalysisProgress(
+  job_id: string,
+): Promise<AnalysisProgress> {
+  return await apiGet<AnalysisProgress>(
+    `/api/analyze/${job_id}/progress`,
+  )
 }
