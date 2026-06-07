@@ -6,7 +6,7 @@ function Footer() {
   ]
 
   return (
-    <footer className="mt-20 border-t border-stone-200/60 px-6 py-8 transition-colors duration-300 dark:border-white/10 dark:bg-slate-950">
+    <footer className="border-t border-stone-200/60 bg-[#F7F7F8] px-6 py-8 transition-colors duration-300 dark:border-white/10 dark:bg-slate-950">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="space-y-1">
