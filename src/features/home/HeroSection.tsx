@@ -18,7 +18,7 @@ function HeroSection({ onScrollToInput }: HeroSectionProps) {
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             약관의 모든 것,<br />
-            약관동의에서<br />
+            약간동의에서<br />
             쉽고 안전하게
           </motion.h1>
 

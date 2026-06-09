@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, Scale, Sparkles } from 'lucide-react'
 import type { AnalysisClause } from '../../types'
-import Badge from '../../components/ui/Badge'
 import CaseCard from './CaseCard'
 
 interface ClauseCardProps {
@@ -17,6 +16,24 @@ const riskLabels = {
   danger: '위험',
 }
 
+const riskStyles = {
+  safe: {
+    dot: 'bg-emerald-500',
+    badge:
+      'bg-emerald-50 text-emerald-600 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20',
+  },
+  warning: {
+    dot: 'bg-amber-500',
+    badge:
+      'bg-amber-50 text-amber-600 ring-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20',
+  },
+  danger: {
+    dot: 'bg-red-500',
+    badge:
+      'bg-red-50 text-red-600 ring-red-100 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20',
+  },
+}
+
 function ClauseCard({
   clause,
   onHover,
@@ -25,25 +42,23 @@ function ClauseCard({
 }: ClauseCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expandedId === clause.id
-
-  const handleMouseEnter = () => {
-    setIsHovered(true)
-    onHover(clause.id)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHovered(false)
-    onHover(null)
-  }
+  const style = riskStyles[clause.risk]
 
   return (
     <div
       className="relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => {
+        setIsHovered(true)
+        onHover(clause.id)
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        onHover(null)
+      }}
       id={`clause-card-${clause.id}`}
     >
       <div
+        onClick={() => onToggleExpand(isExpanded ? null : clause.id)}
         className={`
           relative cursor-pointer overflow-hidden rounded-[30px]
           border bg-white p-6
@@ -57,21 +72,23 @@ function ClauseCard({
               : 'border-stone-200'
           }
         `}
-        onClick={() => onToggleExpand(isExpanded ? null : clause.id)}
       >
         <div className="pointer-events-none absolute right-6 top-4 text-6xl font-black tracking-tighter text-stone-100 dark:text-white/10">
           {String(clause.num).padStart(2, '0')}
         </div>
 
         <div className="relative z-10 flex items-start gap-4">
-          <div className="shrink-0">
-            <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
+          <div className="w-[76px] shrink-0">
+            <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
               ARTICLE {clause.num}
             </p>
 
-            <Badge level={clause.risk} showDot>
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black ring-1 ${style.badge}`}
+            >
+              <span className={`h-2 w-2 rounded-full ${style.dot}`} />
               {riskLabels[clause.risk]}
-            </Badge>
+            </span>
           </div>
 
           <div className="min-w-0 flex-1">
@@ -98,10 +115,9 @@ function ClauseCard({
 
         {isExpanded && (
           <div className="relative z-10 mt-6 border-t border-stone-200 pt-6 dark:border-white/10">
-            <div className="mb-4 rounded-[22px] border border-sky-100 bg-sky-50/60 p-4 transition-colors duration-300 dark:border-sky-400/20 dark:bg-sky-500/10">
+            <div className="mb-4 rounded-[22px] border border-sky-100 bg-sky-50/60 p-4 dark:border-sky-400/20 dark:bg-sky-500/10">
               <div className="mb-2 flex items-center gap-2">
                 <Sparkles size={16} className="text-sky-600 dark:text-sky-400" />
-
                 <span className="text-xs font-black text-sky-600 dark:text-sky-400">
                   AI 분석 요약
                 </span>
@@ -114,7 +130,6 @@ function ClauseCard({
 
             <div className="mb-3 flex items-center gap-2">
               <Scale size={16} className="text-sky-600 dark:text-sky-400" />
-
               <span className="text-xs font-black text-stone-500 dark:text-slate-400">
                 관련 판례
               </span>

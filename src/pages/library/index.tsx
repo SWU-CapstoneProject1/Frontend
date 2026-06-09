@@ -7,8 +7,13 @@ import Footer from '../../components/layout/Footer'
 import LibraryHeader from '../../features/library/LibraryHeader'
 import LibraryToolbar from '../../features/library/LibraryToolbar'
 import ReportCard, { type ReportData } from '../../features/library/ReportCard'
+import AnalysisHistorySection from '../../features/library/AnalysisHistorySection'
 
-import { getHistory } from '../../api/library'
+import {
+  getHistory,
+  
+  type HistoryItem,
+} from '../../api/library'
 import { apiGet } from '../../api/client'
 import {
   getBookmarkedJobIds,
@@ -23,10 +28,33 @@ interface StatsResponse {
   total_services: number
 }
 
+type AnalysisResultDetail = Partial<HistoryItem> & {
+  job_id: string
+  created_at?: string
+  clauses?: unknown[]
+}
+
 function getStatusFromScore(score: number): '위험' | '주의' | '정상' {
   if (score >= 60) return '위험'
   if (score >= 30) return '주의'
   return '정상'
+}
+
+function mergeHistoryWithDetail(
+  history: HistoryItem,
+  detail?: AnalysisResultDetail,
+): HistoryItem {
+  return {
+    ...history,
+    service_name: detail?.service_name ?? history.service_name,
+    status: detail?.status ?? history.status,
+    risk_score: detail?.risk_score ?? history.risk_score,
+    danger_count: detail?.danger_count ?? history.danger_count,
+    caution_count: detail?.caution_count ?? history.caution_count,
+    safe_count: detail?.safe_count ?? history.safe_count,
+    clauses: detail?.clauses ?? history.clauses ?? [],
+    created_at: detail?.created_at ?? history.created_at,
+  }
 }
 
 const SESSION_KEY = 'testkey'
@@ -37,6 +65,7 @@ function LibraryPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('전체')
   const [searchTerm, setSearchTerm] = useState('')
   const [reports, setReports] = useState<ReportData[]>([])
+  const [histories, setHistories] = useState<HistoryItem[]>([])
   const [stats, setStats] = useState<StatsResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -51,29 +80,41 @@ function LibraryPage() {
 
         setStats(statsData)
 
-        const bookmarkedIds = getBookmarkedJobIds()
+        const historyDetails = await Promise.all(
+          historyData.map(async (item) => {
+            try {
+              const detail = await apiGet<AnalysisResultDetail>(
+                `/api/result/${item.job_id}`,
+              )
 
-        const bookmarkedHistory = historyData.filter((item) =>
-          bookmarkedIds.includes(item.job_id)
+              return mergeHistoryWithDetail(item, detail)
+            } catch (e) {
+              console.error(`분석 상세 조회 실패: ${item.job_id}`, e)
+              return mergeHistoryWithDetail(item)
+            }
+          }),
         )
 
-        const resultDetails = await Promise.all(
-          bookmarkedHistory.map((item) =>
-            apiGet<any>(`/api/result/${item.job_id}`)
-          )
+        setHistories(historyDetails)
+
+        const bookmarkedIds = getBookmarkedJobIds()
+
+        const bookmarkedHistory = historyDetails.filter((item) =>
+          bookmarkedIds.includes(item.job_id),
         )
 
         setReports(
-          resultDetails.map((item) => ({
+          bookmarkedHistory.map((item) => ({
             id: item.job_id,
-            title: item.service_name,
+            title: item.service_name || '이름 없는 서비스',
             date: item.created_at?.slice(0, 10).replaceAll('-', '.') ?? '',
             score: item.risk_score,
             clauseCount: item.clauses?.length ?? 0,
             status: getStatusFromScore(item.risk_score),
-          }))
+          })),
         )
       } catch (e) {
+        console.error(e)
         setError('보관함을 불러오지 못했습니다.')
       } finally {
         setIsLoading(false)
@@ -90,17 +131,23 @@ function LibraryPage() {
     정상: reports.filter((r) => r.status === '정상').length,
   }
 
-  const handleDeleteReport = async (id: string) => {
+  const filteredReports = reports.filter((report) => {
+    const matchesFilter =
+      activeFilter === '전체' || report.status === activeFilter
+
+    const matchesSearch = report.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+
+    return matchesFilter && matchesSearch
+  })
+
+  const handleDeleteReport = (id: string) => {
     removeBookmarkedJobId(id)
     setReports((prev) => prev.filter((report) => report.id !== id))
   }
 
-  const filteredReports = reports.filter((report) => {
-    const matchesFilter = activeFilter === '전체' || report.status === activeFilter
-    const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase())
-
-    return matchesFilter && matchesSearch
-  })
+  
 
   if (isLoading) {
     return (
@@ -109,7 +156,11 @@ function LibraryPage() {
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
           <div className="rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
-            <Loader2 size={28} className="mx-auto mb-4 animate-spin text-sky-600 dark:text-sky-400" />
+            <Loader2
+              size={28}
+              className="mx-auto mb-4 animate-spin text-sky-600 dark:text-sky-400"
+            />
+
             <p className="text-sm font-bold text-stone-500 dark:text-slate-400">
               보관함을 불러오는 중입니다...
             </p>
@@ -126,8 +177,14 @@ function LibraryPage() {
 
         <main className="mx-auto flex min-h-[70vh] max-w-6xl items-center justify-center px-6 pt-24">
           <div className="rounded-[30px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
-            <AlertCircle size={28} className="mx-auto mb-4 text-red-500 dark:text-red-400" />
-            <p className="text-sm font-bold text-red-500 dark:text-red-400">{error}</p>
+            <AlertCircle
+              size={28}
+              className="mx-auto mb-4 text-red-500 dark:text-red-400"
+            />
+
+            <p className="text-sm font-bold text-red-500 dark:text-red-400">
+              {error}
+            </p>
           </div>
         </main>
       </div>
@@ -164,6 +221,12 @@ function LibraryPage() {
             <ReportCard isAddCard />
           </div>
         </div>
+
+        <AnalysisHistorySection
+          histories={histories}
+          onClickItem={(jobId) => navigate(`/analysis/${jobId}`)}
+          
+        />
       </main>
 
       <Footer />

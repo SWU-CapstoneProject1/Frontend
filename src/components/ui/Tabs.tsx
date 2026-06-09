@@ -1,7 +1,9 @@
+import type { LucideIcon } from 'lucide-react'
+
 interface TabItem {
   id: string
   label: string
-  icon?: any
+  icon?: LucideIcon
 }
 
 interface TabsProps {
@@ -27,6 +29,7 @@ function Tabs({
           return (
             <button
               key={item.id}
+              type="button"
               onClick={() => onChange(item.id)}
               className={`
                 flex items-center gap-2 rounded-full px-4 py-2
@@ -38,13 +41,7 @@ function Tabs({
                 }
               `}
             >
-              {Icon && (
-                <Icon
-                  size={16}
-                  strokeWidth={2.3}
-                />
-              )}
-
+              {Icon && <Icon size={16} strokeWidth={2.3} />}
               {item.label}
             </button>
           )
@@ -61,6 +58,7 @@ function Tabs({
         return (
           <button
             key={item.id}
+            type="button"
             onClick={() => onChange(item.id)}
             className={`
               relative px-2 py-2 text-sm font-bold

@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { House, Archive, Sun, Moon } from 'lucide-react'
+import { House, Archive, Sun, Moon, Settings } from 'lucide-react'
 
 import Tabs from '../ui/Tabs'
 import logoImg from '../../assets/images/logo_terms_agree.png'
@@ -10,6 +10,7 @@ type Theme = 'light' | 'dark'
 function Header() {
   const navigate = useNavigate()
   const location = useLocation()
+
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null
     return savedTheme ?? 'light'
@@ -28,6 +29,12 @@ function Header() {
       icon: Archive,
       path: '/library',
     },
+    {
+      id: 'settings',
+      label: '설정',
+      icon: Settings,
+      path: '/settings',
+    },
   ]
 
   const getActiveTab = () => {
@@ -37,7 +44,7 @@ function Header() {
     if (exactMatch) return exactMatch.id
 
     const partialMatch = navTabs.find(
-      (tab) => tab.path !== '/' && currentPath.startsWith(tab.path)
+      (tab) => tab.path !== '/' && currentPath.startsWith(tab.path),
     )
     if (partialMatch) return partialMatch.id
 
@@ -73,6 +80,7 @@ function Header() {
     <header className="fixed left-0 right-0 top-0 z-[999] border-b border-stone-200/70 bg-white/90 backdrop-blur-xl transition-colors duration-300 dark:border-white/10 dark:bg-slate-950/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <button
+          type="button"
           onClick={() => navigate('/')}
           className="flex items-center gap-3 transition-opacity hover:opacity-80"
         >
