@@ -1,9 +1,5 @@
 function Footer() {
-  const links = [
-    { label: '이용약관', href: '#' },
-    { label: '개인정보처리방침', href: '#' },
-    { label: '문의하기', href: '#' },
-  ]
+  
 
   return (
     <footer className="border-t border-stone-200/60 bg-[#F7F7F8] px-6 py-8 transition-colors duration-300 dark:border-white/10 dark:bg-slate-950">
@@ -21,17 +17,8 @@ function Footer() {
             </p>
           </div>
 
-          <nav className="flex items-center gap-6">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-xs text-stone-500 transition-colors hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-50"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
+          
+          
         </div>
 
         <p className="text-xs leading-relaxed text-stone-400 dark:text-slate-500">
