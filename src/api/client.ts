@@ -8,7 +8,7 @@
 // ─────────────────────────────────────────────────────────
 
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 // ── 공통 에러 클래스 ──────────────────────────────────────
 export class ApiError extends Error {
@@ -45,6 +45,23 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>
 }
 
+export const apiGet = <T>(path: string) =>
+  request<T>(path, { method: 'GET' })
 
-export const apiGet  = <T>(path: string)               => request<T>(path, { method: 'GET' })
-export const apiPost = <T>(path: string, body: unknown) => request<T>(path, { method: 'POST', body: JSON.stringify(body) })
+export const apiPost = <T>(
+  path: string,
+  body: unknown,
+) =>
+  request<T>(path, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+
+export const apiPut = <T>(
+  path: string,
+  body: unknown,
+) =>
+  request<T>(path, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  })
